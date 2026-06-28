@@ -1,0 +1,474 @@
+@src_HostAddress = http://localhost:5000
+@accessToken = your-jwt-access-token-here
+@refreshToken = your-refresh-token-here
+
+# =============================================================================
+# Auth  (api/v1/auth)
+# =============================================================================
+
+### Register (Customer)
+POST {{src_HostAddress}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "password": "Password123!",
+  "phoneNumber": "+966500000000",
+  "userType": "Customer"
+}
+
+### Register (Worker)
+POST {{src_HostAddress}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Ahmed",
+  "lastName": "Worker",
+  "email": "ahmed.worker@example.com",
+  "password": "Password123!",
+  "phoneNumber": "+966500000001",
+  "userType": "Worker"
+}
+
+### Login
+POST {{src_HostAddress}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "Password123!"
+}
+
+### Refresh token
+POST {{src_HostAddress}}/api/v1/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### Get current user  [Authorize]
+GET {{src_HostAddress}}/api/v1/auth/me
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+### Change password  [Authorize]
+POST {{src_HostAddress}}/api/v1/auth/change-password
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "currentPassword": "Password123!",
+  "newPassword": "NewPassword456!"
+}
+
+### Logout  [Authorize]
+POST {{src_HostAddress}}/api/v1/auth/logout
+Authorization: Bearer {{accessToken}}
+
+# =============================================================================
+# Categories  (api/v1/categories)
+# =============================================================================
+
+### Get all categories (tree)
+GET {{src_HostAddress}}/api/v1/categories
+Accept: application/json
+
+### Get category by id
+GET {{src_HostAddress}}/api/v1/categories/1
+Accept: application/json
+
+### Create category  [Admin]
+POST {{src_HostAddress}}/api/v1/categories
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Plumbing",
+  "description": "Plumbing services",
+  "icon": "plumbing-icon",
+  "banner": "plumbing-banner.jpg",
+  "seoUrl": "plumbing",
+  "parentCategoryId": null,
+  "sortOrder": 1,
+  "isActive": true
+}
+
+### Update category  [Admin]
+PUT {{src_HostAddress}}/api/v1/categories/1
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Plumbing",
+  "description": "Updated description",
+  "icon": "plumbing-icon",
+  "banner": "plumbing-banner.jpg",
+  "seoUrl": "plumbing",
+  "parentCategoryId": null,
+  "sortOrder": 1,
+  "isActive": true
+}
+
+### Delete category  [Admin]
+DELETE {{src_HostAddress}}/api/v1/categories/1
+Authorization: Bearer {{accessToken}}
+
+### Toggle category active status  [Admin]
+PATCH {{src_HostAddress}}/api/v1/categories/1/toggle-active
+Authorization: Bearer {{accessToken}}
+
+# =============================================================================
+# Workers  (api/v1/workers)
+# =============================================================================
+
+### Search workers
+GET {{src_HostAddress}}/api/v1/workers/search?searchTerm=plumber&categoryId=1&minRating=4&maxPrice=500&city=Riyadh&area=Olaya&minExperience=2&availableNow=true&sortBy=rating&page=1&pageSize=10
+Accept: application/json
+
+### Get worker profile by id
+GET {{src_HostAddress}}/api/v1/workers/1
+Accept: application/json
+
+### Get my worker profile  [Worker]
+GET {{src_HostAddress}}/api/v1/workers/profile
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+### Create or update worker profile  [Worker]
+PUT {{src_HostAddress}}/api/v1/workers/profile
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "photo": "https://example.com/photo.jpg",
+  "coverPhoto": "https://example.com/cover.jpg",
+  "biography": "Experienced plumber with 10 years of experience.",
+  "yearsOfExperience": 10,
+  "skills": "Plumbing, Pipe fitting, Water heaters",
+  "serviceAreas": "Riyadh, Jeddah",
+  "hourlyRate": 150.00,
+  "startingPrice": 200.00,
+  "minimumJobValue": 100.00
+}
+
+### Update availability status  [Worker]
+PATCH {{src_HostAddress}}/api/v1/workers/availability
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "isAvailable": true
+}
+
+### Add availability slot  [Worker]
+POST {{src_HostAddress}}/api/v1/workers/availability/slots
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "dayOfWeek": "Monday",
+  "startTime": "08:00:00",
+  "endTime": "17:00:00",
+  "isAvailable": true
+}
+
+### Remove availability slot  [Worker]
+DELETE {{src_HostAddress}}/api/v1/workers/availability/slots/1
+Authorization: Bearer {{accessToken}}
+
+### Add portfolio item  [Worker]
+POST {{src_HostAddress}}/api/v1/workers/portfolio
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "mediaType": "Image",
+  "mediaUrl": "https://example.com/portfolio/work1.jpg",
+  "title": "Kitchen renovation"
+}
+
+### Remove portfolio item  [Worker]
+DELETE {{src_HostAddress}}/api/v1/workers/portfolio/1
+Authorization: Bearer {{accessToken}}
+
+# =============================================================================
+# Services  (api/v1/services)
+# =============================================================================
+
+### Search services
+GET {{src_HostAddress}}/api/v1/services?searchTerm=plumbing&categoryId=1&page=1&pageSize=10
+Accept: application/json
+
+### Get service by id
+GET {{src_HostAddress}}/api/v1/services/1
+Accept: application/json
+
+### Get services by worker
+GET {{src_HostAddress}}/api/v1/services/worker/1
+Accept: application/json
+
+### Create service  [Worker]
+POST {{src_HostAddress}}/api/v1/services
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "categoryId": 1,
+  "title": "Pipe repair",
+  "description": "Professional pipe repair service",
+  "priceType": "Fixed",
+  "price": 250.00,
+  "estimatedDurationMinutes": 60,
+  "materialsIncluded": "Basic fittings",
+  "availableCities": "Riyadh",
+  "tags": "plumbing,pipe,repair",
+  "images": [
+    "https://example.com/service1.jpg"
+  ]
+}
+
+### Update service  [Worker]
+PUT {{src_HostAddress}}/api/v1/services/1
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "categoryId": 1,
+  "title": "Pipe repair (updated)",
+  "description": "Updated description",
+  "priceType": "Hourly",
+  "price": 150.00,
+  "estimatedDurationMinutes": 90,
+  "materialsIncluded": "All materials included",
+  "availableCities": "Riyadh, Jeddah",
+  "tags": "plumbing,pipe",
+  "images": []
+}
+
+### Delete service  [Worker]
+DELETE {{src_HostAddress}}/api/v1/services/1
+Authorization: Bearer {{accessToken}}
+
+### Toggle service active status  [Worker]
+PATCH {{src_HostAddress}}/api/v1/services/1/toggle-active
+Authorization: Bearer {{accessToken}}
+
+# =============================================================================
+# Bookings  (api/v1/bookings)
+# =============================================================================
+
+### Get booking by id  [Authorize]
+GET {{src_HostAddress}}/api/v1/bookings/1
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+### Get my bookings  [Authorize]
+GET {{src_HostAddress}}/api/v1/bookings/my?status=Pending&workerProfileId=1&customerId=1&fromDate=2026-01-01&toDate=2026-12-31&page=1&pageSize=10
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+### Get worker bookings  [Worker]
+GET {{src_HostAddress}}/api/v1/bookings/worker/1?status=Accepted&fromDate=2026-01-01&toDate=2026-12-31&page=1&pageSize=10
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+### Create booking  [Authorize]
+POST {{src_HostAddress}}/api/v1/bookings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "workerProfileId": 1,
+  "workerServiceId": 1,
+  "scheduledAt": "2026-07-15T10:00:00Z",
+  "address": "123 Main St, Riyadh",
+  "notes": "Please call before arrival"
+}
+
+### Accept booking  [Worker]
+PATCH {{src_HostAddress}}/api/v1/bookings/1/accept
+Authorization: Bearer {{accessToken}}
+
+### Reject booking  [Worker]
+PATCH {{src_HostAddress}}/api/v1/bookings/1/reject?reason=Not%20available
+Authorization: Bearer {{accessToken}}
+
+### Cancel booking  [Authorize]
+PATCH {{src_HostAddress}}/api/v1/bookings/1/cancel?reason=Changed%20plans
+Authorization: Bearer {{accessToken}}
+
+### Reschedule booking  [Authorize]
+PATCH {{src_HostAddress}}/api/v1/bookings/1/reschedule?newScheduledAt=2026-07-20T14:00:00Z
+Authorization: Bearer {{accessToken}}
+
+### Mark on the way  [Worker]
+PATCH {{src_HostAddress}}/api/v1/bookings/1/on-the-way
+Authorization: Bearer {{accessToken}}
+
+### Start job  [Worker]
+PATCH {{src_HostAddress}}/api/v1/bookings/1/start
+Authorization: Bearer {{accessToken}}
+
+### Pause job  [Worker]
+PATCH {{src_HostAddress}}/api/v1/bookings/1/pause
+Authorization: Bearer {{accessToken}}
+
+### Complete job  [Worker]
+PATCH {{src_HostAddress}}/api/v1/bookings/1/complete
+Authorization: Bearer {{accessToken}}
+
+# =============================================================================
+# Payments  (api/v1/payments)
+# =============================================================================
+
+### Get payment by booking id  [Authorize]
+GET {{src_HostAddress}}/api/v1/payments/booking/1
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+### Process payment  [Authorize]
+POST {{src_HostAddress}}/api/v1/payments/process
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "bookingId": 1,
+  "paymentMethod": "CreditCard"
+}
+
+### Refund payment  [Admin]
+POST {{src_HostAddress}}/api/v1/payments/1/refund
+Authorization: Bearer {{accessToken}}
+
+# =============================================================================
+# Reviews  (api/v1/reviews)
+# =============================================================================
+
+### Get worker reviews
+GET {{src_HostAddress}}/api/v1/reviews/worker/1?page=1&pageSize=10
+Accept: application/json
+
+### Get review by id
+GET {{src_HostAddress}}/api/v1/reviews/1
+Accept: application/json
+
+### Create review  [Customer]
+POST {{src_HostAddress}}/api/v1/reviews
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "bookingId": 1,
+  "rating": 5,
+  "comment": "Excellent service, very professional!"
+}
+
+### Update review  [Customer]
+PUT {{src_HostAddress}}/api/v1/reviews/1
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "rating": 4,
+  "comment": "Good service, updated review."
+}
+
+### Reply to review  [Worker]
+POST {{src_HostAddress}}/api/v1/reviews/1/reply
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "reply": "Thank you for your feedback!"
+}
+
+### Delete review  [Customer]
+DELETE {{src_HostAddress}}/api/v1/reviews/1
+Authorization: Bearer {{accessToken}}
+
+# =============================================================================
+# Favorites  (api/v1/favorites)
+# =============================================================================
+
+### Get favorites  [Customer]
+GET {{src_HostAddress}}/api/v1/favorites?page=1&pageSize=10
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+### Add favorite worker  [Customer]
+POST {{src_HostAddress}}/api/v1/favorites
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "workerProfileId": 1,
+  "workerServiceId": null
+}
+
+### Add favorite service  [Customer]
+POST {{src_HostAddress}}/api/v1/favorites
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "workerProfileId": null,
+  "workerServiceId": 1
+}
+
+### Remove favorite  [Customer]
+DELETE {{src_HostAddress}}/api/v1/favorites/1
+Authorization: Bearer {{accessToken}}
+
+# =============================================================================
+# Admin  (api/v1/admin)  [Admin role required]
+# =============================================================================
+
+### Get dashboard stats
+GET {{src_HostAddress}}/api/v1/admin/dashboard
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+### Get users (paginated)
+GET {{src_HostAddress}}/api/v1/admin/users?page=1&pageSize=10&role=Customer&search=john
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+### Get user by id
+GET {{src_HostAddress}}/api/v1/admin/users/1
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+### Update user
+PUT {{src_HostAddress}}/api/v1/admin/users/1
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "email": "updated@example.com",
+  "phoneNumber": "+966500000099",
+  "role": "Customer",
+  "lockoutEnabled": false
+}
+
+### Lock user
+POST {{src_HostAddress}}/api/v1/admin/users/1/lock?lockoutEnd=2026-12-31T23:59:59Z
+Authorization: Bearer {{accessToken}}
+
+### Unlock user
+POST {{src_HostAddress}}/api/v1/admin/users/1/lock
+Authorization: Bearer {{accessToken}}
+
+### Delete user
+DELETE {{src_HostAddress}}/api/v1/admin/users/1
+Authorization: Bearer {{accessToken}}
+
+### Export bookings (xlsx)
+GET {{src_HostAddress}}/api/v1/admin/export/bookings?from=2026-01-01&to=2026-12-31
+Authorization: Bearer {{accessToken}}
+
+### Export users (xlsx)
+GET {{src_HostAddress}}/api/v1/admin/export/users?role=Worker
+Authorization: Bearer {{accessToken}}
