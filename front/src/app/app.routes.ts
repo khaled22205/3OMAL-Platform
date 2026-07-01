@@ -28,6 +28,36 @@ export const routes: Routes = [
     loadComponent: () => import('./features/worker/dashboard/worker'),
   },
   {
+    path: 'search',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/search/search'),
+  },
+  {
+    path: 'profile/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/profile/profile'),
+  },
+  {
+    path: 'booking/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/booking/booking'),
+  },
+  {
+    path: 'chat',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/chat/chat'),
+  },
+  {
+    path: 'customer-dashboard',
+    canActivate: [authGuard, roleGuard(['Customer'])],
+    loadComponent: () => import('./features/customer-dashboard/customer-dashboard'),
+  },
+  {
+    path: 'worker-dashboard',
+    canActivate: [authGuard, roleGuard(['Worker'])],
+    loadComponent: () => import('./features/worker-dashboard/worker-dashboard'),
+  },
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('./features/home/home'),

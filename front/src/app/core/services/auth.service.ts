@@ -11,6 +11,7 @@ import {
   UserInfo,
   ChangePasswordRequest,
 } from '../models/auth.models';
+import { User, WorkerProfile } from '../models/interfaces';
 
 interface WrappedResponse<T> {
   success: boolean;
@@ -37,6 +38,24 @@ export class AuthService {
   readonly isAdmin = computed(() => this.roles().includes('Admin'));
   readonly isWorker = computed(() => this.roles().includes('Worker'));
   readonly isCustomer = computed(() => this.roles().includes('Customer'));
+
+  // UI adapter: wraps user() into A-compatible User format
+  readonly currentUser = computed<User | null>(() => {
+    const u = this.user();
+    if (!u) return null;
+    return {
+      id: String(u.id),
+      name: `${u.firstName} ${u.lastName}`.trim() || u.email,
+      email: u.email,
+      phone: u.phoneNumber || '',
+      role: u.roles.includes('Worker') ? 'worker' : u.roles.includes('Customer') ? 'client' : 'client',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100',
+      createdAt: new Date().toISOString()
+    };
+  });
+
+  // Worker profile (mock for now)
+  readonly currentWorkerProfile = signal<WorkerProfile | null>(null);
 
   constructor(
     private readonly http: HttpClient,
