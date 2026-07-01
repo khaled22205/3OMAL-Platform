@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,8 +17,12 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<AppDbContext>(options =>
+        {
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
-                b => b.MigrationsAssembly(typeof(DependencyInjection).Assembly.GetName().Name)));
+                b => b.MigrationsAssembly(typeof(DependencyInjection).Assembly.GetName().Name));
+            options.ConfigureWarnings(w =>
+                w.Ignore(CoreEventId.PossibleIncorrectRequiredNavigationWithQueryFilterInteractionWarning));
+        });
 
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IJwtService, JwtService>();
@@ -33,6 +38,8 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.Payments.IPaymentService, PaymentService>();
         services.AddScoped<Application.Features.Favorites.IFavoriteService, FavoriteService>();
         services.AddScoped<Application.Features.Admin.IAdminService, AdminService>();
+        services.AddScoped<Application.Features.Chat.IChatService, ChatService>();
+        services.AddSingleton<ConnectionManager>();
 
         services.AddHttpContextAccessor();
 

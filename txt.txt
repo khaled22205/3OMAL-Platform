@@ -1,0 +1,608 @@
+Excellent. Your answers make it possible to write a much more precise prompt. Below is a production-level prompt that would be suitable for an AI coding assistant (such as ChatGPT, Claude Code, Cursor, Copilot, etc.) to implement this feature correctly.
+
+---
+
+# Production-Ready Prompt
+
+I have an existing full-stack application consisting of:
+
+* **Backend:** ASP.NET Core (.NET 10) using **Clean Architecture**
+* **Frontend:** Angular (latest version, Standalone Components + Angular Signals)
+
+The backend is located in:
+
+```text
+@back/
+```
+
+The frontend is located in:
+
+```text
+@front/
+```
+
+Before writing any code, thoroughly analyze the existing project structure, architecture, coding conventions, and documentation, especially:
+
+```text
+@back/docs/
+```
+
+Understand how the project is organized and implement the new feature **within the existing architecture**.
+
+---
+
+# Critical Rules
+
+## Do NOT
+
+* Rename any existing files.
+* Rename any existing folders.
+* Rename namespaces.
+* Move files.
+* Change the Clean Architecture boundaries.
+* Rewrite existing authentication.
+* Break any existing functionality.
+* Duplicate existing code.
+
+Reuse existing:
+
+* Authentication
+* Authorization
+* JWT implementation
+* CurrentUserService
+* Identity
+* Repositories
+* Generic repositories
+* MediatR
+* FluentValidation
+* Serilog
+* Dependency Injection
+
+Only create new files where they are actually required.
+
+---
+
+# Objective
+
+Implement a **production-ready real-time one-to-one chat system** similar to **WhatsApp (without groups)** using:
+
+## Backend
+
+* ASP.NET Core
+* SignalR
+* Entity Framework Core
+* SQL Server
+* Clean Architecture
+* JWT Authentication
+* Serilog
+
+## Frontend
+
+* Angular Standalone Components
+* Angular Signals
+* SignalR Client
+* RxJS where appropriate
+
+The implementation must be secure, scalable, maintainable, and extensible.
+
+---
+
+# Business Requirements
+
+## Conversations
+
+Supported conversations:
+
+* Customer ↔ Worker [worker cannot start the converstation, only Customer can start]
+
+
+Not supported:
+
+* Customer ↔ Customer
+* Worker ↔ Worker
+* Admin ↔ Customer
+* Admin ↔ Worker
+* Group chats
+
+Each conversation is strictly **one-to-one**.
+
+---
+
+## Conversation Creation
+
+A conversation is created **manually** when the Customer clicks at Worker profile button:
+
+> **Message Me**
+
+If a conversation already exists between the two users:
+
+* Open the existing conversation.
+* Never create duplicates.
+
+---
+
+## Multiple Conversations
+
+Users may have unlimited conversations.
+
+Conversation history must always remain available.
+
+Users can reopen any conversation at any time.
+
+---
+
+# Message Types
+
+Support the following message types:
+
+* Text
+* Images
+* Files
+* Videos
+* Emojis
+* Hyperlinks
+* Location
+
+Design the architecture so adding future message types requires minimal changes.
+
+---
+
+# Real-Time Features
+
+Implement:
+
+* Real-time messaging
+* Typing indicator
+* Online status
+* Offline status
+* Last Seen
+* Delivered status (✓)
+* Read status (✓✓ Blue like WhatsApp)
+* Message editing
+* Soft message deletion
+* Reply to message
+* Infinite scrolling
+* Automatic reconnection
+* Connection recovery
+* Browser notifications
+* Unread conversation count
+* Conversation ordering by latest message
+* Live conversation list updates
+
+Do **not** implement:
+
+* Group chats
+* Voice calls
+* Voice Notes
+* Video calls
+
+
+However, the architecture should make adding them later straightforward.
+
+---
+
+# Persistence
+
+Store everything permanently in SQL Server.
+
+Implement:
+
+## Conversation
+
+* Participants
+* Created Date
+* Updated Date
+* Last Message
+* Last Activity
+* Soft Delete
+
+---
+
+## Messages
+
+Store:
+
+* Message Type
+* Sender
+* Receiver
+* Reply To
+* Attachment
+* Sent Date
+* Delivered Date
+* Read Date
+* Edited Date
+* Deleted Date
+* IsEdited
+* IsDeleted
+
+Never permanently remove messages.
+
+Use Soft Delete.
+
+---
+
+# Searching
+
+Implement:
+
+Conversation search
+
+Search by:
+
+* User name
+* Last message
+
+Message search
+
+Search inside messages.
+
+---
+
+# Pagination
+
+Conversation List
+
+Use server-side pagination.
+
+Implement infinite scrolling similar to WhatsApp.
+
+Messages
+
+Load messages gradually while scrolling upward.
+
+Never load an entire conversation at once.
+
+---
+
+# Security
+
+SignalR must use JWT Authentication.
+
+Only authenticated users may connect.
+
+Every Hub method must verify:
+
+* User identity
+* Conversation membership
+* Authorization
+
+Users must never be able to:
+
+* Read another conversation
+* Join arbitrary SignalR groups
+* Modify another user's messages
+* Delete another user's messages
+
+All authorization checks must exist in both:
+
+* SignalR Hub
+* Application Layer
+
+Never trust client-side validation.
+
+---
+
+# Backend Architecture
+
+Follow Clean Architecture strictly.
+
+## Domain
+
+Create entities such as:
+
+* Conversation
+* ConversationParticipant
+* Message
+* MessageAttachment
+* MessageReadReceipt
+
+Include:
+
+* Auditing
+* Soft Delete
+* Domain Events where appropriate
+
+---
+
+## Application
+
+Implement:
+
+Commands
+
+Examples:
+
+* CreateConversation
+* SendMessage
+* EditMessage
+* DeleteMessage
+* MarkAsRead
+* UploadAttachment
+
+Queries
+
+Examples:
+
+* GetConversation
+* GetConversations
+* SearchMessages
+* SearchConversations
+* GetUnreadCount
+
+Create:
+
+* DTOs
+* Validators
+* Mapping Profiles
+* Interfaces
+
+Use:
+
+* MediatR
+* FluentValidation
+
+---
+
+## Infrastructure
+
+Implement:
+
+* SignalR Hub
+* EF Core Configurations
+* Repositories
+* File Storage abstraction (future-ready)
+* SQL persistence
+* Dependency Injection
+
+Configure SignalR for future horizontal scaling (e.g., Redis backplane) without implementing it now.
+
+---
+
+## API
+
+Expose REST endpoints where appropriate:
+
+* Conversation management
+* Search
+* Pagination
+* Attachments
+* History
+
+Use SignalR only for real-time communication.
+
+---
+
+# SignalR
+
+Implement:
+
+Connection management
+
+User presence
+
+Typing indicator
+
+Read receipts
+
+Delivered receipts
+
+Automatic reconnect
+
+Connection recovery
+
+Conversation groups
+
+User mapping
+
+Connection cleanup
+
+Heartbeat handling
+
+Handle:
+
+* Multiple browser tabs
+* Browser refresh
+* Unexpected disconnects
+* Reconnection
+* Lost internet connection
+
+---
+
+# Frontend Architecture
+
+Create a feature module:
+
+```text
+features/chat/
+```
+
+Organize into:
+
+```text
+chat/
+
+components/
+pages/
+services/
+signals/
+models/
+guards/
+utils/
+```
+
+Use:
+
+* Standalone Components
+* Angular Signals
+* Lazy Loading
+
+---
+
+# UI
+
+Improve my existing design.
+
+Create a modern interface inspired by WhatsApp.
+
+Include:
+
+Conversation List
+
+Message View
+
+Message Bubble
+
+Typing Indicator
+
+Online Badge
+
+Unread Badge
+
+Attachment Preview
+
+Reply Preview
+
+Search Bar
+
+Message Input
+
+Emoji Picker
+
+Infinite Scroll
+
+Loading Skeletons
+
+Responsive Design
+
+Mobile Friendly
+
+Accessibility (ARIA)
+
+Dark Mode support (future-ready)
+
+The UI should integrate seamlessly with the existing application design system rather than replacing it.
+
+---
+
+# Logging
+
+Use Serilog throughout the feature.
+
+Log:
+
+* User connected
+* User disconnected
+* Conversation created
+* Message sent
+* Message delivered
+* Message read
+* Message edited
+* Message deleted
+* Typing events
+* Unauthorized access attempts
+* SignalR exceptions
+* API exceptions
+
+Never log:
+
+* JWT tokens
+* Passwords
+* Private message contents
+* Sensitive user information
+
+Use structured logging with Correlation IDs where possible.
+
+---
+
+# Performance
+
+Optimize for:
+
+* Async programming
+* Efficient EF Core queries
+* Pagination
+* Lazy loading
+* Connection management
+* Database indexes
+* Minimal SignalR payloads
+
+Avoid N+1 queries.
+
+Design for approximately **50 concurrent users**, while keeping the architecture extensible for future growth.
+
+---
+
+# Future Extensibility
+
+Design the architecture to support future features with minimal refactoring:
+
+* AI Assistant integrated into conversations
+* Voice calls
+* Video calls
+* File storage providers (Azure Blob, AWS S3, etc.)
+* Push notifications
+* Message reactions
+* Conversation pinning
+* Archived conversations
+
+---
+
+# Testing
+
+Create comprehensive tests.
+
+Backend:
+
+* Unit Tests
+* Integration Tests
+* SignalR Hub Tests
+* Authorization Tests
+* Repository Tests
+
+Frontend:
+
+* Component Tests
+* SignalR Service Tests
+* Authentication Integration Tests
+
+---
+
+# Documentation
+
+Update the documentation under:
+
+```text
+@back/docs/
+```
+
+Include:
+
+* Architecture overview
+* Database schema (ERD)
+* SignalR communication flow
+* Authentication flow
+* Authorization rules
+* Sequence diagrams for sending, receiving, editing, deleting, and reading messages
+* Folder structure
+* Extension points for future features
+* Deployment considerations
+
+---
+
+# Expected Deliverables
+
+Provide:
+
+1. A high-level architecture diagram.
+2. Database schema and relationships.
+3. A phased implementation plan before writing code.
+4. Backend implementation following Clean Architecture.
+5. Frontend implementation using Angular best practices.
+6. SignalR integration.
+7. Security implementation.
+8. Performance optimizations.
+9. Testing strategy.
+10. Updated documentation.
+11. A final verification checklist to ensure all features work correctly and integrate seamlessly with the existing application.
+
+The final implementation should be production-ready, maintainable, secure, thoroughly documented, and fully integrated into the existing project without altering its current structure or architectural boundaries.

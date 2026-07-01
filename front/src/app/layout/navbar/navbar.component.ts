@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { ChatStore } from '../../features/chat/signals/chat.store';
 
 @Component({
   selector: 'app-navbar',
@@ -64,7 +65,11 @@ import { AuthService } from '../../core/services/auth.service';
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
-                <span class="absolute top-2 left-2 w-2 h-2 bg-red-500 rounded-full"></span>
+                @if (chatStore.unreadCount() > 0) {
+                  <span class="absolute -top-1 -left-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-extrabold rounded-full flex items-center justify-center px-1">
+                    {{ chatStore.unreadCount() > 99 ? '99+' : chatStore.unreadCount() }}
+                  </span>
+                }
               </a>
 
               <!-- User Profile Dropdown / Link -->
@@ -168,6 +173,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class NavbarComponent {
   authService = inject(AuthService);
+  chatStore = inject(ChatStore);
   darkMode = signal<boolean>(false);
   mobileMenuOpen = signal<boolean>(false);
 
@@ -176,6 +182,9 @@ export class NavbarComponent {
       const savedDark = localStorage.getItem('darkMode') === 'true';
       this.darkMode.set(savedDark);
       this.applyTheme(savedDark);
+    }
+    if (this.authService.isAuthenticated()) {
+      this.chatStore.init();
     }
   }
 

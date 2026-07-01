@@ -3,6 +3,7 @@ using Application.Features.Auth;
 using Application.Features.Admin;
 using Application.Features.Bookings;
 using Application.Features.Categories;
+using Application.Features.Chat;
 using Application.Features.Favorites;
 using Application.Features.Payments;
 using Application.Features.Reviews;
@@ -193,5 +194,53 @@ public static class MappingHelper
         ServiceName = serviceName,
         ServicePrice = servicePrice,
         CreatedAt = favorite.CreatedAt
+    };
+
+    public static UserBriefResponse ToBriefResponse(this (int id, string firstName, string lastName, string? photo) user) => new()
+    {
+        UserId = user.id,
+        FirstName = user.firstName,
+        LastName = user.lastName,
+        Photo = user.photo
+    };
+
+    public static ConversationResponse ToResponse(this Conversation conversation, UserBriefResponse otherUser, int unreadCount) => new()
+    {
+        Id = conversation.Id,
+        OtherUser = otherUser,
+        LastMessage = conversation.LastMessage != null
+            ? conversation.LastMessage.ToResponse(otherUser.FirstName + " " + otherUser.LastName)
+            : null,
+        UnreadCount = unreadCount,
+        LastMessageAt = conversation.LastMessageAt
+    };
+
+    public static MessageResponse ToResponse(this Message message, string senderName) => new()
+    {
+        Id = message.Id,
+        ConversationId = message.ConversationId,
+        SenderId = message.SenderId,
+        SenderName = senderName,
+        MessageType = message.MessageType.ToString(),
+        Content = message.Content,
+        ReplyToMessageId = message.ReplyToMessageId,
+        ReplyToContent = message.ReplyToMessage?.Content,
+        Attachments = message.Attachments?.Select(a => a.ToResponse()).ToList() ?? [],
+        CreatedAt = message.CreatedAt,
+        DeliveredAt = message.DeliveredAt,
+        ReadAt = message.ReadAt,
+        EditedAt = message.EditedAt,
+        IsEdited = message.IsEdited,
+        IsDeleted = message.IsDeleted
+    };
+
+    public static AttachmentResponse ToResponse(this MessageAttachment attachment) => new()
+    {
+        Id = attachment.Id,
+        FileName = attachment.FileName,
+        FilePath = attachment.FilePath,
+        ContentType = attachment.ContentType,
+        FileSize = attachment.FileSize,
+        AttachmentType = attachment.AttachmentType
     };
 }

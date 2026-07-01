@@ -22,6 +22,10 @@ public class AppDbContext : IdentityDbContext<IdentityUser<int>, IdentityRole<in
     public DbSet<Invoice> Invoices => Set<Invoice>();
     public DbSet<Favorite> Favorites => Set<Favorite>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<Conversation> Conversations => Set<Conversation>();
+    public DbSet<ConversationParticipant> ConversationParticipants => Set<ConversationParticipant>();
+    public DbSet<Message> Messages => Set<Message>();
+    public DbSet<MessageAttachment> MessageAttachments => Set<MessageAttachment>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -163,6 +167,53 @@ public class AppDbContext : IdentityDbContext<IdentityUser<int>, IdentityRole<in
         {
             e.HasKey(rt => rt.Token);
             e.HasIndex(rt => rt.UserId);
+        });
+
+        builder.Entity<Conversation>(e =>
+        {
+            e.HasIndex(c => c.LastMessageAt);
+            e.HasQueryFilter(c => !c.IsDeleted);
+            e.HasOne(c => c.LastMessage)
+                .WithMany()
+                .HasForeignKey(c => c.LastMessageId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        builder.Entity<ConversationParticipant>(e =>
+        {
+            e.HasIndex(cp => cp.ConversationId);
+            e.HasIndex(cp => cp.UserId);
+            e.HasIndex(cp => new { cp.ConversationId, cp.UserId }).IsUnique();
+            e.HasOne(cp => cp.Conversation)
+                .WithMany(c => c.Participants)
+                .HasForeignKey(cp => cp.ConversationId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<Message>(e =>
+        {
+            e.HasIndex(m => m.ConversationId);
+            e.HasIndex(m => m.SenderId);
+            e.HasIndex(m => new { m.ConversationId, m.CreatedAt }).IsDescending(false, true);
+            e.HasQueryFilter(m => !m.IsDeleted);
+            e.Property(m => m.MessageType).HasConversion<string>().HasMaxLength(20);
+            e.HasOne(m => m.Conversation)
+                .WithMany(c => c.Messages)
+                .HasForeignKey(m => m.ConversationId)
+                .OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(m => m.ReplyToMessage)
+                .WithMany()
+                .HasForeignKey(m => m.ReplyToMessageId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<MessageAttachment>(e =>
+        {
+            e.HasOne(a => a.Message)
+                .WithMany(m => m.Attachments)
+                .HasForeignKey(a => a.MessageId)
+                .OnDelete(DeleteBehavior.Cascade);
+            e.Property(a => a.AttachmentType).HasMaxLength(20);
         });
     }
 }
