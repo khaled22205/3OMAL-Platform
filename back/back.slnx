@@ -7,4 +7,7 @@
   <Project Path="tests/Application.Tests/Application.Tests.csproj" />
   <Project Path="tests/Infrastructure.Tests/Infrastructure.Tests.csproj" />
   <Project Path="tests/API.Tests/API.Tests.csproj" />
+  <Project Path="tests/Integration.Tests/Integration.Tests.csproj" />
+  <Project Path="tests/SignalR.Tests/SignalR.Tests.csproj" />
+  <Project Path="tests/TestCommon/TestCommon.csproj" />
 </Solution>
