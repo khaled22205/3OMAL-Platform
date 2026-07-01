@@ -1,0 +1,692 @@
+@baseUrl = http://localhost:5000
+@adminToken = {{loginAdmin.response.body.data.accessToken}}
+@customerToken = {{registerCustomer.response.body.data.accessToken}}
+@workerToken = {{registerWorker.response.body.data.accessToken}}
+
+### ============================================
+### AUTH ENDPOINTS
+### ============================================
+
+### Register a new customer
+# @name registerCustomer
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Ahmed",
+  "lastName": "Ali",
+  "email": "customer@test.com",
+  "password": "Test@123",
+  "phoneNumber": "01000000001",
+  "userType": "Customer"
+}
+
+### Register a new worker
+# @name registerWorker
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Mohamed",
+  "lastName": "Hassan",
+  "email": "worker@test.com",
+  "password": "Test@123",
+  "phoneNumber": "01000000002",
+  "userType": "Worker"
+}
+
+### Register another worker
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Ali",
+  "lastName": "Omar",
+  "email": "worker2@test.com",
+  "password": "Test@123",
+  "phoneNumber": "01000000003",
+  "userType": "Worker"
+}
+
+### Login as admin (seeded by default)
+# @name loginAdmin
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@3omal.com",
+  "password": "Admin@123"
+}
+
+### Login as customer
+# @name loginCustomer
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "customer@test.com",
+  "password": "Test@123"
+}
+
+### Login as worker
+# @name loginWorker
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "worker@test.com",
+  "password": "Test@123"
+}
+
+### Refresh token
+POST {{baseUrl}}/api/v1/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{loginAdmin.response.body.data.refreshToken}}"
+}
+
+### Get current user (me)
+GET {{baseUrl}}/api/v1/auth/me
+Authorization: Bearer {{adminToken}}
+
+### Change password
+POST {{baseUrl}}/api/v1/auth/change-password
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "currentPassword": "Test@123",
+  "newPassword": "NewTest@123"
+}
+
+### Logout
+POST {{baseUrl}}/api/v1/auth/logout
+Authorization: Bearer {{customerToken}}
+
+### ============================================
+### CATEGORIES ENDPOINTS
+### ============================================
+
+### Get all categories (tree)
+GET {{baseUrl}}/api/v1/categories
+
+### Get category by ID
+GET {{baseUrl}}/api/v1/categories/1
+
+### Create a new category (Admin)
+# @name createCategory
+POST {{baseUrl}}/api/v1/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Plumbing",
+  "description": "All plumbing services including pipe repair, installation, and maintenance",
+  "icon": "🔧",
+  "seoUrl": "plumbing",
+  "sortOrder": 1,
+  "isActive": true
+}
+
+### Create subcategory (Admin)
+POST {{baseUrl}}/api/v1/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Pipe Repair",
+  "description": "Fix leaking or burst pipes",
+  "icon": "🔩",
+  "seoUrl": "pipe-repair",
+  "parentCategoryId": 1,
+  "sortOrder": 1,
+  "isActive": true
+}
+
+### Create more parent categories (Admin)
+POST {{baseUrl}}/api/v1/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Electrical",
+  "description": "Electrical installation and repair services",
+  "icon": "⚡",
+  "seoUrl": "electrical",
+  "sortOrder": 2,
+  "isActive": true
+}
+
+POST {{baseUrl}}/api/v1/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Cleaning",
+  "description": "Home and office cleaning services",
+  "icon": "🧹",
+  "seoUrl": "cleaning",
+  "sortOrder": 3,
+  "isActive": true
+}
+
+POST {{baseUrl}}/api/v1/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Painting",
+  "description": "Interior and exterior painting services",
+  "icon": "🎨",
+  "seoUrl": "painting",
+  "sortOrder": 4,
+  "isActive": true
+}
+
+POST {{baseUrl}}/api/v1/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Carpentry",
+  "description": "Woodwork, furniture assembly and repair",
+  "icon": "🪚",
+  "seoUrl": "carpentry",
+  "sortOrder": 5,
+  "isActive": true
+}
+
+POST {{baseUrl}}/api/v1/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "HVAC",
+  "description": "Heating, ventilation, and air conditioning services",
+  "icon": "❄️",
+  "seoUrl": "hvac",
+  "sortOrder": 6,
+  "isActive": true
+}
+
+POST {{baseUrl}}/api/v1/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Moving",
+  "description": "Moving and transportation services",
+  "icon": "🚚",
+  "seoUrl": "moving",
+  "sortOrder": 7,
+  "isActive": true
+}
+
+POST {{baseUrl}}/api/v1/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Gardening",
+  "description": "Garden maintenance and landscaping",
+  "icon": "🌿",
+  "seoUrl": "gardening",
+  "sortOrder": 8,
+  "isActive": true
+}
+
+POST {{baseUrl}}/api/v1/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Tech Support",
+  "description": "Computer and technology support services",
+  "icon": "💻",
+  "seoUrl": "tech-support",
+  "sortOrder": 9,
+  "isActive": true
+}
+
+POST {{baseUrl}}/api/v1/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Tutoring",
+  "description": "Private tutoring and educational services",
+  "icon": "📚",
+  "seoUrl": "tutoring",
+  "sortOrder": 10,
+  "isActive": true
+}
+
+### Update category (Admin)
+PUT {{baseUrl}}/api/v1/categories/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Plumbing Services",
+  "description": "Updated description for plumbing services",
+  "icon": "🔧",
+  "seoUrl": "plumbing-services",
+  "sortOrder": 1,
+  "isActive": true
+}
+
+### Toggle category active status (Admin)
+PATCH {{baseUrl}}/api/v1/categories/3/toggle-active
+Authorization: Bearer {{adminToken}}
+
+### Delete category (Admin)
+DELETE {{baseUrl}}/api/v1/categories/99
+Authorization: Bearer {{adminToken}}
+
+### ============================================
+### WORKER ENDPOINTS
+### ============================================
+
+### Search workers
+GET {{baseUrl}}/api/v1/workers/search?searchTerm=plumbing&page=1&pageSize=10
+
+### Search workers with filters
+GET {{baseUrl}}/api/v1/workers/search?categoryId=1&minRating=3&minExperience=1&availableNow=true&sortBy=rating&page=1&pageSize=10
+
+### Get worker profile by ID
+GET {{baseUrl}}/api/v1/workers/1
+
+### Get my worker profile (Worker)
+GET {{baseUrl}}/api/v1/workers/profile
+Authorization: Bearer {{workerToken}}
+
+### Update worker profile (Worker)
+PUT {{baseUrl}}/api/v1/workers/profile
+Authorization: Bearer {{workerToken}}
+Content-Type: application/json
+
+{
+  "biography": "Expert plumber with 10 years of experience in residential and commercial plumbing",
+  "yearsOfExperience": 10,
+  "skills": "Pipe repair, Installation, Maintenance, Water heaters",
+  "serviceAreas": "Cairo, Giza",
+  "hourlyRate": 150.00,
+  "startingPrice": 200.00,
+  "minimumJobValue": 100.00
+}
+
+### Toggle availability (Worker)
+PATCH {{baseUrl}}/api/v1/workers/availability
+Authorization: Bearer {{workerToken}}
+Content-Type: application/json
+
+{
+  "isAvailable": true
+}
+
+### Add availability slot (Worker)
+POST {{baseUrl}}/api/v1/workers/availability/slots
+Authorization: Bearer {{workerToken}}
+Content-Type: application/json
+
+{
+  "dayOfWeek": 0,
+  "startTime": "09:00:00",
+  "endTime": "17:00:00",
+  "isAvailable": true
+}
+
+### Add another availability slot (Worker)
+POST {{baseUrl}}/api/v1/workers/availability/slots
+Authorization: Bearer {{workerToken}}
+Content-Type: application/json
+
+{
+  "dayOfWeek": 1,
+  "startTime": "09:00:00",
+  "endTime": "17:00:00",
+  "isAvailable": true
+}
+
+### Add another availability slot (Worker)
+POST {{baseUrl}}/api/v1/workers/availability/slots
+Authorization: Bearer {{workerToken}}
+Content-Type: application/json
+
+{
+  "dayOfWeek": 2,
+  "startTime": "10:00:00",
+  "endTime": "18:00:00",
+  "isAvailable": true
+}
+
+### Remove availability slot (Worker)
+DELETE {{baseUrl}}/api/v1/workers/availability/slots/1
+Authorization: Bearer {{workerToken}}
+
+### Add portfolio item (Worker)
+POST {{baseUrl}}/api/v1/workers/portfolio
+Authorization: Bearer {{workerToken}}
+Content-Type: application/json
+
+{
+  "mediaType": "Image",
+  "mediaUrl": "/uploads/portfolio/kitchen-pipe-repair.jpg",
+  "title": "Kitchen pipe repair completed"
+}
+
+### Add another portfolio item (Worker)
+POST {{baseUrl}}/api/v1/workers/portfolio
+Authorization: Bearer {{workerToken}}
+Content-Type: application/json
+
+{
+  "mediaType": "Image",
+  "mediaUrl": "/uploads/portfolio/bathroom-installation.jpg",
+  "title": "Full bathroom installation"
+}
+
+### Remove portfolio item (Worker)
+DELETE {{baseUrl}}/api/v1/workers/portfolio/1
+Authorization: Bearer {{workerToken}}
+
+### ============================================
+### SERVICES ENDPOINTS
+### ============================================
+
+### Search services
+GET {{baseUrl}}/api/v1/services?searchTerm=plumbing&page=1&pageSize=10
+
+### Search by category
+GET {{baseUrl}}/api/v1/services?categoryId=1&page=1&pageSize=10
+
+### Get service by ID
+GET {{baseUrl}}/api/v1/services/1
+
+### Get services by worker
+GET {{baseUrl}}/api/v1/services/worker/1
+
+### Create a service (Worker)
+# @name createService
+POST {{baseUrl}}/api/v1/services
+Authorization: Bearer {{workerToken}}
+Content-Type: application/json
+
+{
+  "categoryId": 1,
+  "title": "Pipe Repair & Maintenance",
+  "description": "Professional pipe repair, replacement, and maintenance services for residential and commercial properties",
+  "priceType": "Fixed",
+  "price": 350.00,
+  "estimatedDurationMinutes": 120,
+  "materialsIncluded": "Basic pipes and fittings included. Additional materials charged separately.",
+  "availableCities": "Cairo, Giza",
+  "tags": "plumbing, pipes, repair, maintenance"
+}
+
+### Create another service (Worker)
+POST {{baseUrl}}/api/v1/services
+Authorization: Bearer {{workerToken}}
+Content-Type: application/json
+
+{
+  "categoryId": 1,
+  "title": "Water Heater Installation",
+  "description": "Installation of electric and gas water heaters with warranty",
+  "priceType": "Fixed",
+  "price": 800.00,
+  "estimatedDurationMinutes": 180,
+  "materialsIncluded": "Standard water heater included. Premium models charged extra.",
+  "availableCities": "Cairo",
+  "tags": "water heater, installation, plumbing"
+}
+
+### Update service (Worker)
+PUT {{baseUrl}}/api/v1/services/1
+Authorization: Bearer {{workerToken}}
+Content-Type: application/json
+
+{
+  "categoryId": 1,
+  "title": "Pipe Repair & Maintenance - Updated",
+  "description": "Updated description for pipe repair services",
+  "priceType": "Fixed",
+  "price": 400.00,
+  "estimatedDurationMinutes": 90,
+  "materialsIncluded": "Basic pipes and fittings included",
+  "availableCities": "Cairo, Giza, Alexandria",
+  "tags": "plumbing, pipes, repair"
+}
+
+### Toggle service active status (Worker)
+PATCH {{baseUrl}}/api/v1/services/2/toggle-active
+Authorization: Bearer {{workerToken}}
+
+### Delete service (Worker)
+DELETE {{baseUrl}}/api/v1/services/99
+Authorization: Bearer {{workerToken}}
+
+### ============================================
+### BOOKINGS ENDPOINTS (requires auth)
+### ============================================
+
+### Create a booking (Customer)
+# @name createBooking
+POST {{baseUrl}}/api/v1/bookings
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "workerProfileId": 1,
+  "workerServiceId": 1,
+  "scheduledAt": "2026-07-05T10:00:00",
+  "address": "12 Nile Street, Cairo",
+  "notes": "Please bring all necessary tools"
+}
+
+### Get booking by ID
+GET {{baseUrl}}/api/v1/bookings/1
+Authorization: Bearer {{customerToken}}
+
+### Get my bookings (Customer)
+GET {{baseUrl}}/api/v1/bookings/my?page=1&pageSize=10
+Authorization: Bearer {{customerToken}}
+
+### Get my bookings with status filter (Customer)
+GET {{baseUrl}}/api/v1/bookings/my?status=Pending&page=1&pageSize=10
+Authorization: Bearer {{customerToken}}
+
+### Get worker bookings (Worker)
+GET {{baseUrl}}/api/v1/bookings/worker/1?page=1&pageSize=10
+Authorization: Bearer {{workerToken}}
+
+### ============================================
+### BOOKING LIFECYCLE (Worker actions)
+### ============================================
+
+### Accept booking (Worker)
+PATCH {{baseUrl}}/api/v1/bookings/1/accept
+Authorization: Bearer {{workerToken}}
+
+### Worker marks as on the way
+PATCH {{baseUrl}}/api/v1/bookings/1/on-the-way
+Authorization: Bearer {{workerToken}}
+
+### Reject booking (Worker) - requires a new booking in pending state
+PATCH {{baseUrl}}/api/v1/bookings/1/reject?reason=Schedule conflict
+Authorization: Bearer {{workerToken}}
+
+### Start job (Worker)
+PATCH {{baseUrl}}/api/v1/bookings/1/start
+Authorization: Bearer {{workerToken}}
+
+### Pause job (Worker)
+PATCH {{baseUrl}}/api/v1/bookings/1/pause
+Authorization: Bearer {{workerToken}}
+
+### Complete job (Worker)
+PATCH {{baseUrl}}/api/v1/bookings/1/complete
+Authorization: Bearer {{workerToken}}
+
+### ============================================
+### BOOKING LIFECYCLE (Customer actions)
+### ============================================
+
+### Cancel booking (Customer)
+PATCH {{baseUrl}}/api/v1/bookings/1/cancel?reason=Changed my mind
+Authorization: Bearer {{customerToken}}
+
+### Reschedule booking (Customer)
+PATCH {{baseUrl}}/api/v1/bookings/1/reschedule?newScheduledAt=2026-07-10T14%3A00%3A00
+Authorization: Bearer {{customerToken}}
+
+### ============================================
+### REVIEWS ENDPOINTS
+### ============================================
+
+### Get worker reviews
+GET {{baseUrl}}/api/v1/reviews/worker/1?page=1&pageSize=10
+
+### Get review by ID
+GET {{baseUrl}}/api/v1/reviews/1
+
+### Create a review (Customer - after booking completed)
+POST {{baseUrl}}/api/v1/reviews
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "bookingId": 1,
+  "rating": 5,
+  "comment": "Excellent work! Very professional and on time."
+}
+
+### Update review (Customer)
+PUT {{baseUrl}}/api/v1/reviews/1
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "rating": 4,
+  "comment": "Good work, updated review after follow-up service."
+}
+
+### Reply to review (Worker)
+POST {{baseUrl}}/api/v1/reviews/1/reply
+Authorization: Bearer {{workerToken}}
+Content-Type: application/json
+
+{
+  "reply": "Thank you for your feedback! Glad you're satisfied with the service."
+}
+
+### Delete review (Customer)
+DELETE {{baseUrl}}/api/v1/reviews/1
+Authorization: Bearer {{customerToken}}
+
+### ============================================
+### PAYMENTS ENDPOINTS
+### ============================================
+
+### Get payment by booking ID
+GET {{baseUrl}}/api/v1/payments/booking/1
+Authorization: Bearer {{customerToken}}
+
+### Process payment
+POST {{baseUrl}}/api/v1/payments/process
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "bookingId": 1,
+  "paymentMethod": "Credit Card"
+}
+
+### Refund payment (Admin)
+POST {{baseUrl}}/api/v1/payments/1/refund
+Authorization: Bearer {{adminToken}}
+
+### ============================================
+### FAVORITES ENDPOINTS (Customer only)
+### ============================================
+
+### Get my favorites
+GET {{baseUrl}}/api/v1/favorites?page=1&pageSize=10
+Authorization: Bearer {{customerToken}}
+
+### Add favorite worker
+POST {{baseUrl}}/api/v1/favorites
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "workerProfileId": 1
+}
+
+### Add favorite service
+POST {{baseUrl}}/api/v1/favorites
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{
+  "workerServiceId": 1
+}
+
+### Remove favorite
+DELETE {{baseUrl}}/api/v1/favorites/1
+Authorization: Bearer {{customerToken}}
+
+### ============================================
+### ADMIN ENDPOINTS (Admin only)
+### ============================================
+
+### Get dashboard stats
+GET {{baseUrl}}/api/v1/admin/dashboard
+Authorization: Bearer {{adminToken}}
+
+### Get all users (paginated)
+GET {{baseUrl}}/api/v1/admin/users?page=1&pageSize=10
+Authorization: Bearer {{adminToken}}
+
+### Filter users by role
+GET {{baseUrl}}/api/v1/admin/users?role=Worker&page=1&pageSize=10
+Authorization: Bearer {{adminToken}}
+
+### Search users
+GET {{baseUrl}}/api/v1/admin/users?search=admin&page=1&pageSize=10
+Authorization: Bearer {{adminToken}}
+
+### Get user by ID
+GET {{baseUrl}}/api/v1/admin/users/1
+Authorization: Bearer {{adminToken}}
+
+### Update user (Admin)
+PUT {{baseUrl}}/api/v1/admin/users/2
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "email": "customer@test.com",
+  "phoneNumber": "01000000001"
+}
+
+### Lock user (Admin)
+POST {{baseUrl}}/api/v1/admin/users/2/lock?lockoutEnd=2026-12-31T23%3A59%3A59
+Authorization: Bearer {{adminToken}}
+
+### Unlock user (Admin)
+POST {{baseUrl}}/api/v1/admin/users/2/lock
+Authorization: Bearer {{adminToken}}
+
+### Delete user (Admin)
+DELETE {{baseUrl}}/api/v1/admin/users/99
+Authorization: Bearer {{adminToken}}
+
+### Export bookings to Excel (Admin)
+GET {{baseUrl}}/api/v1/admin/export/bookings?from=2026-01-01&to=2026-12-31
+Authorization: Bearer {{adminToken}}
+
+### Export users to Excel (Admin)
+GET {{baseUrl}}/api/v1/admin/export/users?role=Worker
+Authorization: Bearer {{adminToken}}

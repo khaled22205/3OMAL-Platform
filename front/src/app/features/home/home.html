@@ -1,0 +1,24 @@
+<div class="app-shell">
+  <header class="app-header">
+    <h1 class="logo">3OMAL</h1>
+    <nav class="nav-links">
+      <span class="user-info">{{ user()?.firstName }} {{ user()?.lastName }}</span>
+      <span class="role-badge">{{ roles()[0] }}</span>
+      <button class="btn btn-outline" (click)="logout()">Logout</button>
+    </nav>
+  </header>
+
+  <main class="app-content">
+    <div class="welcome-card">
+      <h2>Welcome, {{ user()?.firstName }}!</h2>
+      <p>You are signed in as <strong>{{ roles()[0] }}</strong>.</p>
+      <ul class="info-list">
+        <li><strong>Email:</strong> {{ user()?.email }}</li>
+        <li><strong>User ID:</strong> {{ user()?.id }}</li>
+        @if (user()?.phoneNumber) {
+          <li><strong>Phone:</strong> {{ user()?.phoneNumber }}</li>
+        }
+      </ul>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,35 @@
+<div class="app-shell">
+  <header class="app-header">
+    <h1 class="logo">3OMAL</h1>
+    <nav class="nav-links">
+      <span class="user-info">{{ user()?.firstName }} {{ user()?.lastName }}</span>
+      <span class="role-badge">Admin</span>
+      <button class="btn btn-outline" (click)="logout()">Logout</button>
+    </nav>
+  </header>
+
+  <main class="app-content">
+    <div class="welcome-card">
+      <h2>Admin Dashboard</h2>
+      <p>Manage platform users, verify workers, and oversee operations.</p>
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>Users</h3>
+          <p>Manage all registered users and their roles.</p>
+        </div>
+        <div class="admin-card">
+          <h3>Workers</h3>
+          <p>Review and approve worker profiles.</p>
+        </div>
+        <div class="admin-card">
+          <h3>Reports</h3>
+          <p>View platform analytics and reports.</p>
+        </div>
+        <div class="admin-card">
+          <h3>Settings</h3>
+          <p>Configure platform settings.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,31 @@
+<div class="app-shell">
+  <header class="app-header">
+    <h1 class="logo">3OMAL</h1>
+    <nav class="nav-links">
+      <span class="user-info">{{ user()?.firstName }} {{ user()?.lastName }}</span>
+      <span class="role-badge">Customer</span>
+      <button class="btn btn-outline" (click)="logout()">Logout</button>
+    </nav>
+  </header>
+
+  <main class="app-content">
+    <div class="welcome-card">
+      <h2>My Services</h2>
+      <p>Browse and manage your service requests.</p>
+      <div class="customer-grid">
+        <div class="customer-card">
+          <h3>Find Workers</h3>
+          <p>Search for available workers near you.</p>
+        </div>
+        <div class="customer-card">
+          <h3>My Requests</h3>
+          <p>Track your active and past service requests.</p>
+        </div>
+        <div class="customer-card">
+          <h3>Favorites</h3>
+          <p>View your favorite workers.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
