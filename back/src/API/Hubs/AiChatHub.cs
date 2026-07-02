@@ -1,11 +1,10 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Application.Features.AiAssistant;
 using Application.Common.Interfaces;
 
 namespace API.Hubs;
 
-[Authorize]
+// No [Authorize] — guests can connect too; auth is handled per-method
 public class AiChatHub : Hub
 {
     private readonly IAiAssistantService _assistantService;
@@ -28,11 +27,21 @@ public class AiChatHub : Hub
     public override async Task OnConnectedAsync()
     {
         var userId = GetUserId();
+        var sessionId = GetSessionId();
+
         if (userId.HasValue)
         {
-            _logger.LogInformation("User {UserId} connected to AI chat hub", userId.Value);
+            var role = GetUserRole();
+            _logger.LogInformation(
+                "Authenticated user {UserId} ({Role}) connected to AI hub", userId.Value, role);
             await Groups.AddToGroupAsync(Context.ConnectionId, $"ai_user_{userId.Value}");
         }
+        else if (!string.IsNullOrEmpty(sessionId))
+        {
+            _logger.LogInformation("Guest session {SessionId} connected to AI hub", sessionId);
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"ai_session_{sessionId}");
+        }
+
         await base.OnConnectedAsync();
     }
 
@@ -40,21 +49,14 @@ public class AiChatHub : Hub
     {
         var userId = GetUserId();
         if (userId.HasValue)
-        {
-            _logger.LogInformation("User {UserId} disconnected from AI chat hub", userId.Value);
-        }
+            _logger.LogInformation("User {UserId} disconnected from AI hub", userId.Value);
         await base.OnDisconnectedAsync(exception);
     }
 
-    public async Task SendMessage(int conversationId, string content)
+    public async Task SendMessage(int conversationId, string content, string? sessionId = null)
     {
         var userId = GetUserId();
-        if (userId == null)
-        {
-            await Clients.Caller.SendAsync("AiResponseError", "Not authenticated");
-            return;
-        }
-
+        var resolvedSessionId = sessionId ?? GetSessionId();
         var role = GetUserRole();
 
         try
@@ -62,18 +64,20 @@ public class AiChatHub : Hub
             var request = new SendAiMessageRequest
             {
                 ConversationId = conversationId,
-                Content = content
+                Content = content,
+                SessionId = resolvedSessionId
             };
 
             await foreach (var chunk in _assistantService.SendMessageStreamAsync(
-                userId.Value, role, request, Context.ConnectionAborted))
+                userId, resolvedSessionId, role, request, Context.ConnectionAborted))
             {
                 await Clients.Caller.SendAsync("AiResponseChunk", chunk);
 
                 if (chunk.IsComplete)
                 {
-                    _logger.LogInformation("AI streaming completed for conversation {ConvId}, user {UserId}",
-                        conversationId, userId.Value);
+                    _logger.LogInformation(
+                        "AI streaming completed for conversation {ConvId}, user {UserId}, session {SessionId}",
+                        conversationId, userId, resolvedSessionId);
                 }
             }
         }
@@ -83,44 +87,50 @@ public class AiChatHub : Hub
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "AI streaming error for conversation {ConvId}, user {UserId}",
-                conversationId, userId.Value);
+            _logger.LogError(ex,
+                "AI streaming error for conversation {ConvId}, user {UserId}, session {SessionId}",
+                conversationId, userId, resolvedSessionId);
             await Clients.Caller.SendAsync("AiResponseError", "An error occurred processing your request");
         }
     }
 
-    public async Task StartConversation(string? title, string? firstMessage)
+    public async Task StartConversation(string? title, string? firstMessage, string? sessionId = null)
     {
         var userId = GetUserId();
-        if (userId == null)
-        {
-            await Clients.Caller.SendAsync("AiResponseError", "Not authenticated");
-            return;
-        }
-
+        var resolvedSessionId = sessionId ?? GetSessionId();
         var role = GetUserRole();
+
         var request = new StartConversationRequest
         {
             Title = title,
-            FirstMessage = firstMessage
+            FirstMessage = firstMessage,
+            SessionId = resolvedSessionId
         };
 
-        var conversation = await _assistantService.StartConversationAsync(userId.Value, role, request);
+        var conversation = await _assistantService.StartConversationAsync(
+            userId, resolvedSessionId, role, request);
         await Clients.Caller.SendAsync("AiConversationCreated", conversation);
     }
 
-    public async Task DeleteConversation(int conversationId)
+    public async Task DeleteConversation(int conversationId, string? sessionId = null)
     {
         var userId = GetUserId();
-        if (userId == null) return;
+        var resolvedSessionId = sessionId ?? GetSessionId();
+        var role = GetUserRole();
 
-        await _conversationService.DeleteConversationAsync(conversationId, userId.Value);
+        await _conversationService.DeleteConversationAsync(
+            conversationId, userId, resolvedSessionId, role);
         await Clients.Caller.SendAsync("AiConversationDeleted", conversationId);
     }
 
-    private int? GetUserId()
+    private int? GetUserId() => _currentUser.GetUserId();
+
+    private string? GetSessionId()
     {
-        return _currentUser.GetUserId();
+        // Client can pass session ID as a query param on connection
+        if (Context.GetHttpContext()?.Request.Query.TryGetValue("sessionId", out var sid) == true)
+            return sid.ToString();
+        return null;
     }
 
     private string GetUserRole()

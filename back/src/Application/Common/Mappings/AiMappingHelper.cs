@@ -8,8 +8,13 @@ public static class AiMappingHelper
     public static AiConversationSummaryResponse ToSummaryResponse(this AiConversation conversation, AiMessageResponse? lastMessage = null) => new()
     {
         Id = conversation.Id,
+        UserId = conversation.UserId,
+        SessionId = conversation.SessionId,
+        UserRole = conversation.UserRole,
         Title = conversation.Title,
         Language = conversation.Language,
+        IsArchived = conversation.IsArchived,
+        IsHidden = conversation.IsHidden,
         LastMessage = lastMessage,
         CreatedAt = conversation.CreatedAt,
         UpdatedAt = conversation.UpdatedAt
@@ -18,8 +23,13 @@ public static class AiMappingHelper
     public static AiConversationDetailResponse ToDetailResponse(this AiConversation conversation) => new()
     {
         Id = conversation.Id,
+        UserId = conversation.UserId,
+        SessionId = conversation.SessionId,
+        UserRole = conversation.UserRole,
         Title = conversation.Title,
         Language = conversation.Language,
+        IsArchived = conversation.IsArchived,
+        IsHidden = conversation.IsHidden,
         Messages = conversation.Messages.Select(m => m.ToResponse()).ToList(),
         CreatedAt = conversation.CreatedAt,
         UpdatedAt = conversation.UpdatedAt

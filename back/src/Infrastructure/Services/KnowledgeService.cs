@@ -24,22 +24,27 @@ public class KnowledgeService : IKnowledgeService
     {
         var items = new List<KnowledgeItem>();
 
+        // Categories
         var categories = await _context.Categories
             .Where(c => c.IsActive && !c.IsDeleted)
             .ToListAsync();
 
         foreach (var cat in categories)
         {
+            var text = $"{cat.Name} {cat.Description}";
             items.Add(new KnowledgeItem
             {
                 SourceType = "category",
                 SourceId = cat.Id,
                 Title = cat.Name,
                 Excerpt = cat.Description ?? cat.Name,
-                Text = $"{cat.Name} {cat.Description}"
+                Text = text,
+                Embedding = await _embeddingService.GenerateEmbeddingAsync(text),
+                RequiredRoles = [] // Public
             });
         }
 
+        // Workers (public information)
         var workers = await _context.WorkerProfiles
             .Where(w => !w.IsDeleted && w.IsAvailable)
             .ToListAsync();
@@ -62,16 +67,21 @@ public class KnowledgeService : IKnowledgeService
 
             var workerSvcs = workerServiceLookup.GetValueOrDefault(worker.Id, []);
             var serviceNames = string.Join(", ", workerSvcs.Select(s => s.Title));
+            var text = $"{userName} {worker.Biography} {worker.Skills} {serviceNames} {worker.ServiceAreas}";
+
             items.Add(new KnowledgeItem
             {
                 SourceType = "worker",
                 SourceId = worker.Id,
                 Title = $"Worker: {userName}",
                 Excerpt = $"{userName} - Rating: {worker.AverageRating}, Jobs: {worker.CompletedJobs}, Services: {serviceNames}",
-                Text = $"{userName} {worker.Biography} {worker.Skills} {serviceNames} {worker.ServiceAreas}"
+                Text = text,
+                Embedding = await _embeddingService.GenerateEmbeddingAsync(text),
+                RequiredRoles = [] // Public - customers and guests can see workers
             });
         }
 
+        // Services (public)
         var services = await _context.WorkerServices
             .Where(s => s.IsActive && !s.IsDeleted)
             .Include(s => s.Category)
@@ -80,19 +90,21 @@ public class KnowledgeService : IKnowledgeService
 
         foreach (var service in services)
         {
+            var text = $"{service.Title} {service.Description} {service.Tags} {service.Price}";
             items.Add(new KnowledgeItem
             {
                 SourceType = "service",
                 SourceId = service.Id,
                 Title = service.Title,
                 Excerpt = $"{service.Title} - {service.Price} EGP - {service.Category?.Name}",
-                Text = $"{service.Title} {service.Description} {service.Tags} {service.Price}"
+                Text = text,
+                Embedding = await _embeddingService.GenerateEmbeddingAsync(text),
+                RequiredRoles = [] // Public
             });
         }
 
         _knowledgeIndex = items;
-
-        _logger.LogInformation("Knowledge index initialized with {Count} items", items.Count);
+        _logger.LogInformation("Knowledge index initialized with {Count} items (embeddings computed)", items.Count);
     }
 
     public async Task<List<SearchResult>> RetrieveAsync(string query, KnowledgeContext context, int topK = 5)
@@ -103,14 +115,19 @@ public class KnowledgeService : IKnowledgeService
         }
 
         var queryVector = await _embeddingService.GenerateEmbeddingAsync(query);
+        var userRoles = context.Roles ?? [];
 
         var scored = _knowledgeIndex
+            .Where(item =>
+                // If item has no role restriction it's public; else user must have one of required roles
+                item.RequiredRoles.Count == 0 ||
+                item.RequiredRoles.Any(r => userRoles.Contains(r)))
             .Select(item => new
             {
                 Item = item,
                 Score = _embeddingService.ComputeSimilarity(queryVector, item.Embedding)
             })
-            .Where(x => x.Score > 0.1)
+            .Where(x => x.Score > 0.05) // lowered threshold for better recall
             .OrderByDescending(x => x.Score)
             .Take(topK)
             .Select(x => new SearchResult
@@ -134,5 +151,7 @@ public class KnowledgeService : IKnowledgeService
         public string Excerpt { get; set; } = string.Empty;
         public string Text { get; set; } = string.Empty;
         public float[] Embedding { get; set; } = [];
+        /// <summary>Empty means public (no restriction). Non-empty means only these roles can see it.</summary>
+        public List<string> RequiredRoles { get; set; } = [];
     }
 }

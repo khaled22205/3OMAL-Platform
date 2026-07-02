@@ -20,11 +20,14 @@ public class AiConversationService : IAiConversationService
         _logger = logger;
     }
 
-    public async Task<AiConversationSummaryResponse> CreateConversationAsync(int userId, string language, string? title, string? firstMessage)
+    public async Task<AiConversationSummaryResponse> CreateConversationAsync(
+        int? userId, string? sessionId, string userRole, string language, string? title, string? firstMessage)
     {
         var conversation = new AiConversation
         {
             UserId = userId,
+            SessionId = sessionId,
+            UserRole = userRole,
             Title = title ?? GenerateTitle(firstMessage),
             Language = language,
             CreatedAt = DateTime.UtcNow
@@ -33,17 +36,42 @@ public class AiConversationService : IAiConversationService
         _context.AiConversations.Add(conversation);
         await _context.SaveChangesAsync();
 
-        _logger.LogInformation("AI conversation {ConversationId} created for user {UserId}",
-            conversation.Id, userId);
+        _logger.LogInformation(
+            "AI conversation {ConversationId} created for user {UserId} / session {SessionId} with role {Role}",
+            conversation.Id, userId, sessionId, userRole);
 
         return conversation.ToSummaryResponse();
     }
 
-    public async Task<PagedResult<AiConversationSummaryResponse>> GetConversationsAsync(int userId, int page, int pageSize)
+    public async Task<PagedResult<AiConversationSummaryResponse>> GetConversationsAsync(
+        int? userId, string? sessionId, string userRole, int page, int pageSize)
     {
-        var query = _context.AiConversations
-            .Where(c => c.UserId == userId)
-            .OrderByDescending(c => c.UpdatedAt ?? c.CreatedAt);
+        IQueryable<AiConversation> query;
+
+        if (userId.HasValue)
+        {
+            // Authenticated: show only their own conversations (by userId AND matching role so Admin can't see Customer convs)
+            query = _context.AiConversations
+                .Where(c => c.UserId == userId.Value && c.UserRole == userRole)
+                .OrderByDescending(c => c.UpdatedAt ?? c.CreatedAt);
+        }
+        else if (!string.IsNullOrEmpty(sessionId))
+        {
+            // Guest: show only conversations from this session
+            query = _context.AiConversations
+                .Where(c => c.SessionId == sessionId && c.UserId == null)
+                .OrderByDescending(c => c.UpdatedAt ?? c.CreatedAt);
+        }
+        else
+        {
+            return new PagedResult<AiConversationSummaryResponse>
+            {
+                Items = [],
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = 0
+            };
+        }
 
         var totalCount = await query.CountAsync();
 
@@ -68,23 +96,68 @@ public class AiConversationService : IAiConversationService
         };
     }
 
-    public async Task<AiConversationDetailResponse?> GetConversationAsync(int conversationId, int userId)
+    public async Task<AiConversationDetailResponse?> GetConversationAsync(
+        int conversationId, int? userId, string? sessionId, string userRole)
     {
-        var conversation = await _context.AiConversations
-            .Include(c => c.Messages.Where(m => !m.IsDeleted)
-                .OrderBy(m => m.CreatedAt))
-                .ThenInclude(m => m.ContextReferences)
-            .FirstOrDefaultAsync(c => c.Id == conversationId && c.UserId == userId && !c.IsDeleted);
+        AiConversation? conversation;
 
-        if (conversation == null) return null;
+        if (userId.HasValue)
+        {
+            conversation = await _context.AiConversations
+                .Include(c => c.Messages.Where(m => !m.IsDeleted).OrderBy(m => m.CreatedAt))
+                    .ThenInclude(m => m.ContextReferences)
+                .FirstOrDefaultAsync(c =>
+                    c.Id == conversationId &&
+                    c.UserId == userId.Value &&
+                    c.UserRole == userRole &&
+                    !c.IsDeleted);
+        }
+        else if (!string.IsNullOrEmpty(sessionId))
+        {
+            conversation = await _context.AiConversations
+                .Include(c => c.Messages.Where(m => !m.IsDeleted).OrderBy(m => m.CreatedAt))
+                    .ThenInclude(m => m.ContextReferences)
+                .FirstOrDefaultAsync(c =>
+                    c.Id == conversationId &&
+                    c.SessionId == sessionId &&
+                    c.UserId == null &&
+                    !c.IsDeleted);
+        }
+        else
+        {
+            return null;
+        }
 
-        return conversation.ToDetailResponse();
+        return conversation?.ToDetailResponse();
     }
 
-    public async Task<bool> DeleteConversationAsync(int conversationId, int userId)
+    public async Task<bool> DeleteConversationAsync(
+        int conversationId, int? userId, string? sessionId, string userRole)
     {
-        var conversation = await _context.AiConversations
-            .FirstOrDefaultAsync(c => c.Id == conversationId && c.UserId == userId && !c.IsDeleted);
+        AiConversation? conversation;
+
+        if (userId.HasValue)
+        {
+            conversation = await _context.AiConversations
+                .FirstOrDefaultAsync(c =>
+                    c.Id == conversationId &&
+                    c.UserId == userId.Value &&
+                    c.UserRole == userRole &&
+                    !c.IsDeleted);
+        }
+        else if (!string.IsNullOrEmpty(sessionId))
+        {
+            conversation = await _context.AiConversations
+                .FirstOrDefaultAsync(c =>
+                    c.Id == conversationId &&
+                    c.SessionId == sessionId &&
+                    c.UserId == null &&
+                    !c.IsDeleted);
+        }
+        else
+        {
+            return false;
+        }
 
         if (conversation == null) return false;
 
@@ -101,20 +174,44 @@ public class AiConversationService : IAiConversationService
 
         await _context.SaveChangesAsync();
 
-        _logger.LogInformation("AI conversation {ConversationId} deleted by user {UserId}",
-            conversationId, userId);
+        _logger.LogInformation(
+            "AI conversation {ConversationId} deleted by user {UserId} / session {SessionId}",
+            conversationId, userId, sessionId);
 
         return true;
     }
 
-    public async Task<PagedResult<AiConversationSummaryResponse>> SearchConversationsAsync(int userId, string query, int page, int pageSize)
+    public async Task<PagedResult<AiConversationSummaryResponse>> SearchConversationsAsync(
+        int? userId, string? sessionId, string userRole, string query, int page, int pageSize)
     {
         var normalizedQuery = query.Trim().ToLowerInvariant();
 
-        var queryable = _context.AiConversations
-            .Where(c => c.UserId == userId && !c.IsDeleted)
-            .Where(c => EF.Functions.Like(c.Title, $"%{normalizedQuery}%"))
-            .OrderByDescending(c => c.UpdatedAt ?? c.CreatedAt);
+        IQueryable<AiConversation> queryable;
+
+        if (userId.HasValue)
+        {
+            queryable = _context.AiConversations
+                .Where(c => c.UserId == userId.Value && c.UserRole == userRole && !c.IsDeleted)
+                .Where(c => EF.Functions.Like(c.Title, $"%{normalizedQuery}%"))
+                .OrderByDescending(c => c.UpdatedAt ?? c.CreatedAt);
+        }
+        else if (!string.IsNullOrEmpty(sessionId))
+        {
+            queryable = _context.AiConversations
+                .Where(c => c.SessionId == sessionId && c.UserId == null && !c.IsDeleted)
+                .Where(c => EF.Functions.Like(c.Title, $"%{normalizedQuery}%"))
+                .OrderByDescending(c => c.UpdatedAt ?? c.CreatedAt);
+        }
+        else
+        {
+            return new PagedResult<AiConversationSummaryResponse>
+            {
+                Items = [],
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = 0
+            };
+        }
 
         var totalCount = await queryable.CountAsync();
 
@@ -139,7 +236,9 @@ public class AiConversationService : IAiConversationService
         };
     }
 
-    public async Task<AiMessageResponse> AddMessageAsync(int conversationId, int userId, string role, string content, List<SearchResult>? sources = null)
+    public async Task<AiMessageResponse> AddMessageAsync(
+        int conversationId, int? userId, string? sessionId, string userRole,
+        string role, string content, List<SearchResult>? sources = null)
     {
         if (!Enum.TryParse<AiMessageRole>(role, true, out var messageRole))
             messageRole = AiMessageRole.User;
@@ -166,6 +265,9 @@ public class AiConversationService : IAiConversationService
                 RelevanceScore = s.RelevanceScore,
                 CreatedAt = DateTime.UtcNow
             }).ToList();
+
+            _context.AiContextReferences.AddRange(references);
+            message.ContextReferences = references;
 
             message.SourcesJson = System.Text.Json.JsonSerializer.Serialize(
                 sources.Select(s => new { s.SourceType, s.SourceId, s.Title, s.RelevanceScore }));

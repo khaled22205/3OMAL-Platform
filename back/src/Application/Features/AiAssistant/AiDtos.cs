@@ -4,19 +4,26 @@ public class StartConversationRequest
 {
     public string? Title { get; set; }
     public string? FirstMessage { get; set; }
+    public string? SessionId { get; set; }
 }
 
 public class SendAiMessageRequest
 {
     public int ConversationId { get; set; }
     public string Content { get; set; } = string.Empty;
+    public string? SessionId { get; set; }
 }
 
 public class AiConversationSummaryResponse
 {
     public int Id { get; set; }
+    public int? UserId { get; set; }
+    public string? SessionId { get; set; }
+    public string UserRole { get; set; } = "Guest";
     public string Title { get; set; } = string.Empty;
     public string Language { get; set; } = "en";
+    public bool IsArchived { get; set; }
+    public bool IsHidden { get; set; }
     public AiMessageResponse? LastMessage { get; set; }
     public int MessageCount { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -26,8 +33,13 @@ public class AiConversationSummaryResponse
 public class AiConversationDetailResponse
 {
     public int Id { get; set; }
+    public int? UserId { get; set; }
+    public string? SessionId { get; set; }
+    public string UserRole { get; set; } = "Guest";
     public string Title { get; set; } = string.Empty;
     public string Language { get; set; } = "en";
+    public bool IsArchived { get; set; }
+    public bool IsHidden { get; set; }
     public List<AiMessageResponse> Messages { get; set; } = [];
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }

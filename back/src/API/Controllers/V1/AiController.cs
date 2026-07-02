@@ -6,6 +6,7 @@ using Application.Features.AiAssistant;
 
 namespace API.Controllers.V1;
 
+[AllowAnonymous]
 public class AiController : BaseApiController
 {
     private readonly IAiAssistantService _assistantService;
@@ -25,45 +26,51 @@ public class AiController : BaseApiController
     [HttpPost("conversations")]
     public async Task<IActionResult> StartConversation([FromBody] StartConversationRequest request)
     {
-        var userId = GetUserId();
-        var role = GetUserRole();
-        var result = await _assistantService.StartConversationAsync(userId, role, request);
+        var (userId, sessionId, role) = ResolveContext(request.SessionId);
+        var result = await _assistantService.StartConversationAsync(userId, sessionId, role, request);
         return CreatedResult(result, "Conversation started");
     }
 
     [HttpGet("conversations")]
-    public async Task<IActionResult> GetConversations([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    public async Task<IActionResult> GetConversations(
+        [FromQuery] string? sessionId = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20)
     {
-        var userId = GetUserId();
-        var result = await _conversationService.GetConversationsAsync(userId, page, pageSize);
+        var (userId, resolvedSession, role) = ResolveContext(sessionId);
+        var result = await _conversationService.GetConversationsAsync(userId, resolvedSession, role, page, pageSize);
         return OkResult(result);
     }
 
     [HttpGet("conversations/{id:int}")]
-    public async Task<IActionResult> GetConversation(int id)
+    public async Task<IActionResult> GetConversation(int id, [FromQuery] string? sessionId = null)
     {
-        var userId = GetUserId();
-        var conversation = await _conversationService.GetConversationAsync(id, userId);
+        var (userId, resolvedSession, role) = ResolveContext(sessionId);
+        var conversation = await _conversationService.GetConversationAsync(id, userId, resolvedSession, role);
         if (conversation == null)
             return NotFoundResult("Conversation not found");
         return OkResult(conversation);
     }
 
     [HttpDelete("conversations/{id:int}")]
-    public async Task<IActionResult> DeleteConversation(int id)
+    public async Task<IActionResult> DeleteConversation(int id, [FromQuery] string? sessionId = null)
     {
-        var userId = GetUserId();
-        var deleted = await _conversationService.DeleteConversationAsync(id, userId);
+        var (userId, resolvedSession, role) = ResolveContext(sessionId);
+        var deleted = await _conversationService.DeleteConversationAsync(id, userId, resolvedSession, role);
         if (!deleted)
             return NotFoundResult("Conversation not found");
         return OkResult(true, "Conversation deleted");
     }
 
     [HttpGet("conversations/search")]
-    public async Task<IActionResult> SearchConversations([FromQuery] string q, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    public async Task<IActionResult> SearchConversations(
+        [FromQuery] string q,
+        [FromQuery] string? sessionId = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20)
     {
-        var userId = GetUserId();
-        var result = await _conversationService.SearchConversationsAsync(userId, q, page, pageSize);
+        var (userId, resolvedSession, role) = ResolveContext(sessionId);
+        var result = await _conversationService.SearchConversationsAsync(userId, resolvedSession, role, q, page, pageSize);
         return OkResult(result);
     }
 
@@ -71,17 +78,20 @@ public class AiController : BaseApiController
     public async Task<IActionResult> SendMessage(int id, [FromBody] SendAiMessageRequest request)
     {
         request.ConversationId = id;
-        var userId = GetUserId();
-        var role = GetUserRole();
-        var result = await _assistantService.SendMessageAsync(userId, role, request);
+        var (userId, sessionId, role) = ResolveContext(request.SessionId);
+        var result = await _assistantService.SendMessageAsync(userId, sessionId, role, request);
         return OkResult(result);
     }
 
     [HttpGet("conversations/{id:int}/messages")]
-    public async Task<IActionResult> GetMessages(int id, [FromQuery] int page = 1, [FromQuery] int pageSize = 50)
+    public async Task<IActionResult> GetMessages(
+        int id,
+        [FromQuery] string? sessionId = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50)
     {
-        var userId = GetUserId();
-        var conversation = await _conversationService.GetConversationAsync(id, userId);
+        var (userId, resolvedSession, role) = ResolveContext(sessionId);
+        var conversation = await _conversationService.GetConversationAsync(id, userId, resolvedSession, role);
         if (conversation == null)
             return NotFoundResult("Conversation not found");
 
@@ -106,6 +116,30 @@ public class AiController : BaseApiController
         var role = GetUserRole();
         var result = await _assistantService.GetSuggestedPromptsAsync(role);
         return OkResult(result);
+    }
+
+    /// <summary>
+    /// Resolves the caller's identity context: authenticated user ID + role, or guest session ID.
+    /// </summary>
+    private (int? userId, string? sessionId, string role) ResolveContext(string? clientSessionId)
+    {
+        var userId = _currentUser.GetUserId();
+        var role = GetUserRole();
+
+        if (userId.HasValue)
+        {
+            // Authenticated user — ignore any session ID from client
+            return (userId, null, role);
+        }
+
+        // Guest — use client-supplied session ID
+        var sessionId = !string.IsNullOrWhiteSpace(clientSessionId)
+            ? clientSessionId
+            : Request.Headers.TryGetValue("X-Session-Id", out var header)
+                ? header.ToString()
+                : null;
+
+        return (null, sessionId, "Guest");
     }
 
     private string GetUserRole()
