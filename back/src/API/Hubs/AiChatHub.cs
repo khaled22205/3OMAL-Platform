@@ -9,15 +9,18 @@ namespace API.Hubs;
 public class AiChatHub : Hub
 {
     private readonly IAiAssistantService _assistantService;
+    private readonly IAiConversationService _conversationService;
     private readonly ICurrentUserService _currentUser;
     private readonly ILogger<AiChatHub> _logger;
 
     public AiChatHub(
         IAiAssistantService assistantService,
+        IAiConversationService conversationService,
         ICurrentUserService currentUser,
         ILogger<AiChatHub> logger)
     {
         _assistantService = assistantService;
+        _conversationService = conversationService;
         _currentUser = currentUser;
         _logger = logger;
     }
@@ -62,9 +65,10 @@ public class AiChatHub : Hub
                 Content = content
             };
 
-            await foreach (var chunk in _assistantService.SendMessageStreamAsync(userId.Value, role, request, Context.ConnectionAborted))
+            await foreach (var chunk in _assistantService.SendMessageStreamAsync(
+                userId.Value, role, request, Context.ConnectionAborted))
             {
-                await Clients.Caller.SendAsync("AiResponseChunk", chunk, Context.ConnectionAborted);
+                await Clients.Caller.SendAsync("AiResponseChunk", chunk);
 
                 if (chunk.IsComplete)
                 {
@@ -110,7 +114,7 @@ public class AiChatHub : Hub
         var userId = GetUserId();
         if (userId == null) return;
 
-        await _assistantService.StartConversationAsync(userId.Value, GetUserRole(), new());
+        await _conversationService.DeleteConversationAsync(conversationId, userId.Value);
         await Clients.Caller.SendAsync("AiConversationDeleted", conversationId);
     }
 

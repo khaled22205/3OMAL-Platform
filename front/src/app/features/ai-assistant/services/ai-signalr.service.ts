@@ -23,10 +23,18 @@ export class AiSignalrService {
   readonly onConversationCreated$: Observable<AiConversationSummary> =
     this.conversationCreatedSubject.asObservable();
 
+  private pendingMessages: Array<{ method: string; args: unknown[] }> = [];
+  private connectionPromise: Promise<void> | null = null;
+
   async startConnection(): Promise<void> {
     const token = this.authService.getAccessToken();
     if (!token) return;
 
+    this.connectionPromise = this.establishConnection(token);
+    await this.connectionPromise;
+  }
+
+  private async establishConnection(token: string): Promise<void> {
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`${environment.apiUrl.replace('/api/v1', '')}/hubs/ai`, {
         accessTokenFactory: () => token,
@@ -39,12 +47,15 @@ export class AiSignalrService {
     try {
       await this.hubConnection.start();
       this.connectionState.set(signalR.HubConnectionState.Connected);
+      this.flushPendingMessages();
     } catch {
       this.connectionState.set(signalR.HubConnectionState.Disconnected);
     }
   }
 
   async stopConnection(): Promise<void> {
+    this.pendingMessages = [];
+    this.connectionPromise = null;
     if (this.hubConnection) {
       await this.hubConnection.stop();
       this.hubConnection = null;
@@ -53,20 +64,47 @@ export class AiSignalrService {
   }
 
   async sendMessage(conversationId: number, content: string): Promise<void> {
+    await this.ensureConnected();
     if (this.hubConnection?.state === signalR.HubConnectionState.Connected) {
       await this.hubConnection.invoke('SendMessage', conversationId, content);
     }
   }
 
   async startConversation(title?: string, firstMessage?: string): Promise<void> {
+    await this.ensureConnected();
     if (this.hubConnection?.state === signalR.HubConnectionState.Connected) {
       await this.hubConnection.invoke('StartConversation', title ?? null, firstMessage ?? null);
     }
   }
 
   async deleteConversation(conversationId: number): Promise<void> {
+    await this.ensureConnected();
     if (this.hubConnection?.state === signalR.HubConnectionState.Connected) {
       await this.hubConnection.invoke('DeleteConversation', conversationId);
+    }
+  }
+
+  private async ensureConnected(): Promise<void> {
+    if (this.hubConnection?.state === signalR.HubConnectionState.Connected) return;
+
+    if (this.hubConnection?.state === signalR.HubConnectionState.Reconnecting) {
+      try {
+        await this.hubConnection.stop();
+      } catch { /* ignore */ }
+    }
+
+    if (this.connectionPromise) {
+      await this.connectionPromise;
+    } else {
+      await this.startConnection();
+    }
+  }
+
+  private flushPendingMessages(): void {
+    const msgs = [...this.pendingMessages];
+    this.pendingMessages = [];
+    for (const msg of msgs) {
+      this.hubConnection?.invoke(msg.method, ...msg.args).catch(() => {});
     }
   }
 

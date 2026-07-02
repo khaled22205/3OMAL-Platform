@@ -52,3 +52,5 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+# User secrets and development config
+back/src/API/appsettings.Development.json

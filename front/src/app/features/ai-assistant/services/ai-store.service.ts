@@ -50,6 +50,8 @@ export class AiStore {
 
   private subscriptions: Subscription[] = [];
   private pendingContent = '';
+  private streamingTimeout: ReturnType<typeof setTimeout> | null = null;
+  private readonly STREAMING_TIMEOUT_MS = 30_000;
 
   toggle(): void {
     if (!this.isOpen()) {
@@ -91,6 +93,7 @@ export class AiStore {
   destroy(): void {
     this.subscriptions.forEach((s) => s.unsubscribe());
     this.signalr.stopConnection();
+    this.clearStreamingTimeout();
   }
 
   async loadConversations(page = 1): Promise<void> {
@@ -155,6 +158,7 @@ export class AiStore {
     this.pendingContent = '';
     this.error.set(null);
 
+    this.startStreamingTimeout();
     await this.signalr.sendMessage(convId, content.trim());
   }
 
@@ -221,6 +225,7 @@ export class AiStore {
 
   private handleChunk(chunk: AiStreamChunk): void {
     if (chunk.isComplete) {
+      this.clearStreamingTimeout();
       const fullContent = this.pendingContent;
       this.isStreaming.set(false);
       this.streamingContent.set('');
@@ -240,12 +245,31 @@ export class AiStore {
         this.loadConversations();
       }
     } else if (chunk.error) {
+      this.clearStreamingTimeout();
       this.error.set(chunk.error);
       this.isStreaming.set(false);
       this.pendingContent = '';
     } else {
+      this.clearStreamingTimeout();
       this.pendingContent += chunk.content;
       this.streamingContent.set(this.pendingContent);
+    }
+  }
+
+  private startStreamingTimeout(): void {
+    this.clearStreamingTimeout();
+    this.streamingTimeout = setTimeout(() => {
+      this.isStreaming.set(false);
+      this.streamingContent.set('');
+      this.pendingContent = '';
+      this.error.set('Response timed out. Please try again.');
+    }, this.STREAMING_TIMEOUT_MS);
+  }
+
+  private clearStreamingTimeout(): void {
+    if (this.streamingTimeout !== null) {
+      clearTimeout(this.streamingTimeout);
+      this.streamingTimeout = null;
     }
   }
 
