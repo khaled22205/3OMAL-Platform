@@ -10,8 +10,33 @@ import { ConversationResponse, MessageResponse } from '../models/chat.models';
 
 describe('ChatStore', () => {
   let store: ChatStore;
-  let mockApi: Record<string, ReturnType<typeof vi.fn>>;
-  let mockSignalr: Record<string, ReturnType<typeof vi.fn> | Record<string, any>>;
+  let mockApi: {
+    getConversations: ReturnType<typeof vi.fn>;
+    getMessages: ReturnType<typeof vi.fn>;
+    getUnreadCount: ReturnType<typeof vi.fn>;
+    searchConversations: ReturnType<typeof vi.fn>;
+    searchMessages: ReturnType<typeof vi.fn>;
+  };
+  let mockSignalr: {
+    startConnection: ReturnType<typeof vi.fn>;
+    stopConnection: ReturnType<typeof vi.fn>;
+    joinConversationGroup: ReturnType<typeof vi.fn>;
+    leaveConversationGroup: ReturnType<typeof vi.fn>;
+    sendMessage: ReturnType<typeof vi.fn>;
+    editMessage: ReturnType<typeof vi.fn>;
+    deleteMessage: ReturnType<typeof vi.fn>;
+    markAsRead: ReturnType<typeof vi.fn>;
+    startTyping: ReturnType<typeof vi.fn>;
+    stopTyping: ReturnType<typeof vi.fn>;
+    onNewMessage$: import('rxjs').Observable<MessageResponse>;
+    onMessageEdited$: import('rxjs').Observable<MessageResponse>;
+    onMessageDeleted$: import('rxjs').Observable<{ messageId: number; userId: number }>;
+    onMessagesRead$: import('rxjs').Observable<{ conversationId: number; readByUserId: number; messageIds: number[] }>;
+    onUserTyping$: import('rxjs').Observable<{ conversationId: number; userId: number }>;
+    onUserStoppedTyping$: import('rxjs').Observable<{ conversationId: number; userId: number }>;
+    onUserOnline$: import('rxjs').Observable<number>;
+    onUserOffline$: import('rxjs').Observable<number>;
+  };
   let mockAuth: { user: ReturnType<typeof signal>; getAccessToken: ReturnType<typeof vi.fn> };
 
   const mockConversations: ConversationResponse[] = [

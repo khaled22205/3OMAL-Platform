@@ -10,13 +10,14 @@ import { ToastService } from '../../core/services/toast.service';
 import { BookingResponse, BookingFilterRequest, BookingStatus } from '../../core/models/booking.models';
 import { WorkerProfileResponse, WorkerProfileRequest } from '../../core/models/worker.models';
 import { Booking, WorkerProfile } from '../../core/models/interfaces';
+import AiDashboardPageComponent from '../ai-assistant/pages/ai-dashboard-page/ai-dashboard-page.component';
 
-type Tab = 'stats' | 'bookings-pending' | 'bookings-active' | 'portfolio' | 'settings';
+type Tab = 'stats' | 'bookings-pending' | 'bookings-active' | 'portfolio' | 'settings' | 'ai';
 
 @Component({
   selector: 'app-worker-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, AiDashboardPageComponent],
   template: `
     <div
       class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-slate-50 dark:bg-slate-900 transition-colors duration-300 min-h-screen"
@@ -106,6 +107,17 @@ type Tab = 'stats' | 'bookings-pending' | 'bookings-active' | 'portfolio' | 'set
                 class="w-full text-right px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer"
               >
                 ⚙️ إعدادات الحساب
+              </button>
+              <button
+                (click)="activeTab.set('ai')"
+                [class]="
+                  activeTab() === 'ai'
+                    ? 'bg-primary/10 text-primary font-black'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900'
+                "
+                class="w-full text-right px-4 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer"
+              >
+                🤖 المساعد الذكي
               </button>
             </div>
           </div>
@@ -441,6 +453,9 @@ type Tab = 'stats' | 'bookings-pending' | 'bookings-active' | 'portfolio' | 'set
                   </button>
                 </form>
               </div>
+            }
+            @if (activeTab() === 'ai') {
+              <app-ai-dashboard-page />
             }
           }
         </div>

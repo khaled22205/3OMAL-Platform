@@ -2,6 +2,7 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { AiApiService } from './ai-api.service';
 import { AiSignalrService } from './ai-signalr.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { SessionService } from './session.service';
 import {
   AiConversationSummary,
   AiMessage,
@@ -14,8 +15,10 @@ export class AiStore {
   private api = inject(AiApiService);
   private signalr = inject(AiSignalrService);
   private authService = inject(AuthService);
+  private sessionService = inject(SessionService);
 
   readonly isOpen = signal(false);
+  readonly isDashboardMode = signal(false);
   readonly conversations = signal<AiConversationSummary[]>([]);
   readonly conversationsPage = signal(1);
   readonly hasMoreConversations = signal(true);
@@ -55,9 +58,16 @@ export class AiStore {
 
   toggle(): void {
     if (!this.isOpen()) {
+      if (!this.isAuthenticated()) {
+        this.sessionService.newSessionId();
+        this.conversations.set([]);
+        this.hasMoreConversations.set(true);
+        this.conversationsPage.set(1);
+      }
       this.isOpen.set(true);
-      this.loadConversations();
+      this.isDashboardMode.set(false);
       this.loadSuggestions();
+      this.clearConversation();
     } else {
       this.isOpen.set(false);
     }
@@ -65,14 +75,29 @@ export class AiStore {
 
   open(): void {
     if (!this.isOpen()) {
+      if (!this.isAuthenticated()) {
+        this.sessionService.newSessionId();
+        this.conversations.set([]);
+        this.hasMoreConversations.set(true);
+        this.conversationsPage.set(1);
+      }
       this.isOpen.set(true);
-      this.loadConversations();
+      this.isDashboardMode.set(false);
       this.loadSuggestions();
+      this.clearConversation();
     }
+  }
+
+  openDashboard(): void {
+    this.isOpen.set(true);
+    this.isDashboardMode.set(true);
+    this.loadConversations();
+    this.loadSuggestions();
   }
 
   close(): void {
     this.isOpen.set(false);
+    this.isDashboardMode.set(false);
   }
 
   init(): void {
@@ -165,23 +190,21 @@ export class AiStore {
   async startNewConversation(firstMessage?: string): Promise<void> {
     this.error.set(null);
 
-    if (this.isAuthenticated()) {
-      try {
-        const conv = await this.api.startConversation({
-          title: firstMessage ? firstMessage.slice(0, 100) : undefined,
-          firstMessage,
-        }).toPromise();
+    try {
+      const conv = await this.api.startConversation({
+        title: firstMessage ? firstMessage.slice(0, 100) : undefined,
+        firstMessage,
+      }).toPromise();
 
-        if (conv) {
-          this.handleNewConversation(conv);
-          if (firstMessage) {
-            setTimeout(() => this.sendMessage(firstMessage), 100);
-          }
-          return;
+      if (conv) {
+        this.handleNewConversation(conv);
+        if (firstMessage) {
+          setTimeout(() => this.sendMessage(firstMessage), 100);
         }
-      } catch {
-        this.error.set('Failed to start conversation');
+        return;
       }
+    } catch {
+      this.error.set('Failed to start conversation');
     }
 
     this.messages.set([]);

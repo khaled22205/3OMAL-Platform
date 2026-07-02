@@ -1,7 +1,14 @@
+export type UserRole = 'Admin' | 'Worker' | 'Customer' | 'Guest';
+
 export interface AiConversationSummary {
   id: number;
+  userId: number | null;
+  sessionId: string | null;
+  userRole: UserRole;
   title: string;
   language: string;
+  isArchived: boolean;
+  isHidden: boolean;
   lastMessage: AiMessage | null;
   messageCount: number;
   createdAt: string;
@@ -10,8 +17,13 @@ export interface AiConversationSummary {
 
 export interface AiConversationDetail {
   id: number;
+  userId: number | null;
+  sessionId: string | null;
+  userRole: UserRole;
   title: string;
   language: string;
+  isArchived: boolean;
+  isHidden: boolean;
   messages: AiMessage[];
   createdAt: string;
   updatedAt: string | null;
@@ -46,11 +58,13 @@ export interface AiStreamChunk {
 export interface StartConversationRequest {
   title?: string;
   firstMessage?: string;
+  sessionId?: string;
 }
 
 export interface SendAiMessageRequest {
   conversationId: number;
   content: string;
+  sessionId?: string;
 }
 
 export interface AiSuggestedPrompts {

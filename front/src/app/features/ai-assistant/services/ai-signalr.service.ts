@@ -2,12 +2,14 @@ import { Injectable, signal, inject } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
+import { SessionService } from './session.service';
 import { AiStreamChunk, AiConversationSummary } from '../models/ai.models';
 import { Subject, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AiSignalrService {
   private authService = inject(AuthService);
+  private sessionService = inject(SessionService);
 
   private hubConnection: signalR.HubConnection | null = null;
   readonly connectionState = signal<signalR.HubConnectionState>(
@@ -28,16 +30,17 @@ export class AiSignalrService {
 
   async startConnection(): Promise<void> {
     const token = this.authService.getAccessToken();
-    if (!token) return;
-
     this.connectionPromise = this.establishConnection(token);
     await this.connectionPromise;
   }
 
-  private async establishConnection(token: string): Promise<void> {
+  private async establishConnection(token: string | null): Promise<void> {
+    const baseUrl = environment.apiUrl.replace('/api/v1', '');
+    const sessionId = this.sessionService.getSessionId();
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`${environment.apiUrl.replace('/api/v1', '')}/hubs/ai`, {
-        accessTokenFactory: () => token,
+      .withUrl(`${baseUrl}/hubs/ai?sessionId=${encodeURIComponent(sessionId)}`, {
+        accessTokenFactory: () => token ?? '',
+        transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.ServerSentEvents | signalR.HttpTransportType.LongPolling,
       })
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
       .build();
@@ -64,16 +67,18 @@ export class AiSignalrService {
   }
 
   async sendMessage(conversationId: number, content: string): Promise<void> {
+    const sessionId = this.sessionService.getSessionId();
     await this.ensureConnected();
     if (this.hubConnection?.state === signalR.HubConnectionState.Connected) {
-      await this.hubConnection.invoke('SendMessage', conversationId, content);
+      await this.hubConnection.invoke('SendMessage', conversationId, content, sessionId);
     }
   }
 
   async startConversation(title?: string, firstMessage?: string): Promise<void> {
+    const sessionId = this.sessionService.getSessionId();
     await this.ensureConnected();
     if (this.hubConnection?.state === signalR.HubConnectionState.Connected) {
-      await this.hubConnection.invoke('StartConversation', title ?? null, firstMessage ?? null);
+      await this.hubConnection.invoke('StartConversation', title ?? null, firstMessage ?? null, sessionId);
     }
   }
 

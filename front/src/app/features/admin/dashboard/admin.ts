@@ -6,13 +6,14 @@ import { AuthService } from '../../../core/services/auth.service';
 import { AdminService } from '../../../core/services/admin.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { DashboardStatsResponse, UserManagementResponse } from '../../../core/models/admin.models';
+import AiDashboardPageComponent from '../../ai-assistant/pages/ai-dashboard-page/ai-dashboard-page.component';
 
-type AdminTab = 'overview' | 'users' | 'reports';
+type AdminTab = 'overview' | 'users' | 'reports' | 'ai';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AiDashboardPageComponent],
   templateUrl: './admin.html',
   styleUrl: './admin.css',
 })

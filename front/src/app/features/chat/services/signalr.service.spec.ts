@@ -21,7 +21,7 @@ describe('SignalrService', () => {
     invoke: ReturnType<typeof vi.fn>;
     on: ReturnType<typeof vi.fn>;
     off: ReturnType<typeof vi.fn>;
-    state: number;
+    state: signalR.HubConnectionState;
     onreconnecting: ReturnType<typeof vi.fn>;
     onreconnected: ReturnType<typeof vi.fn>;
     onclose: ReturnType<typeof vi.fn>;
