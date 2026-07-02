@@ -30,7 +30,7 @@ describe('NavbarComponent', () => {
     mockAuth = {
       currentUser: computed(() => currentUserSignal()),
       isAuthenticated: computed(() => currentUserSignal() !== null),
-      roles: computed(() => currentUserSignal() ? ['Customer'] : []),
+      roles: computed(() => (currentUserSignal() ? ['Customer'] : [])),
       logout: vi.fn(),
       navigateByRole: vi.fn(),
     };
@@ -62,7 +62,7 @@ describe('NavbarComponent', () => {
   it('should render login/register links when not authenticated', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     const links = compiled.querySelectorAll('a');
-    const loginLink = Array.from(links).find(l => l.textContent?.includes('تسجيل الدخول'));
+    const loginLink = Array.from(links).find((l) => l.textContent?.includes('تسجيل الدخول'));
     expect(loginLink).toBeTruthy();
   });
 

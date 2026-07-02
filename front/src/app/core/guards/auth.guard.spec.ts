@@ -24,10 +24,7 @@ describe('authGuard', () => {
 
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
-      providers: [
-        provideRouter([]),
-        { provide: AuthService, useValue: mockAuthService },
-      ],
+      providers: [provideRouter([]), { provide: AuthService, useValue: mockAuthService }],
     });
   });
 
@@ -71,10 +68,7 @@ describe('guestGuard', () => {
 
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
-      providers: [
-        provideRouter([]),
-        { provide: AuthService, useValue: mockAuthService },
-      ],
+      providers: [provideRouter([]), { provide: AuthService, useValue: mockAuthService }],
     });
   });
 

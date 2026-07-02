@@ -2,10 +2,7 @@ import 'zone.js';
 import 'zone.js/testing';
 import { NgModule } from '@angular/core';
 import { getTestBed } from '@angular/core/testing';
-import {
-  BrowserTestingModule,
-  platformBrowserTesting,
-} from '@angular/platform-browser/testing';
+import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -14,10 +11,18 @@ Object.defineProperty(globalThis, 'localStorage', {
     let store: Record<string, string> = {};
     return {
       getItem: (key: string) => store[key] ?? null,
-      setItem: (key: string, value: string) => { store[key] = value; },
-      removeItem: (key: string) => { delete store[key]; },
-      clear: () => { store = {}; },
-      get length() { return Object.keys(store).length; },
+      setItem: (key: string, value: string) => {
+        store[key] = value;
+      },
+      removeItem: (key: string) => {
+        delete store[key];
+      },
+      clear: () => {
+        store = {};
+      },
+      get length() {
+        return Object.keys(store).length;
+      },
       key: (_: number) => null,
     };
   })(),
@@ -26,15 +31,8 @@ Object.defineProperty(globalThis, 'localStorage', {
 });
 
 @NgModule({
-  imports: [
-    BrowserTestingModule,
-    HttpClientModule,
-    HttpClientTestingModule,
-  ],
+  imports: [BrowserTestingModule, HttpClientModule, HttpClientTestingModule],
 })
 class TestModule {}
 
-getTestBed().initTestEnvironment(
-  TestModule,
-  platformBrowserTesting(),
-);
+getTestBed().initTestEnvironment(TestModule, platformBrowserTesting());

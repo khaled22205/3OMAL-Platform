@@ -53,14 +53,13 @@ describe('SignalrService', () => {
       build: vi.fn().mockReturnValue(mockHubConnection),
     };
 
-    vi.mocked(signalR.HubConnectionBuilder).mockImplementation(function() { return mockBuilder as any; });
+    vi.mocked(signalR.HubConnectionBuilder).mockImplementation(function () {
+      return mockBuilder as any;
+    });
 
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
-      providers: [
-        SignalrService,
-        { provide: AuthService, useValue: mockAuthService },
-      ],
+      providers: [SignalrService, { provide: AuthService, useValue: mockAuthService }],
     });
 
     service = TestBed.inject(SignalrService);
@@ -108,7 +107,12 @@ describe('SignalrService', () => {
       mockHubConnection.start.mockResolvedValue(undefined);
       await service.startConnection();
 
-      const request = { conversationId: 1, messageType: 'Text', content: 'hello', replyToMessageId: null };
+      const request = {
+        conversationId: 1,
+        messageType: 'Text',
+        content: 'hello',
+        replyToMessageId: null,
+      };
       mockHubConnection.invoke.mockResolvedValue(undefined);
 
       await service.sendMessage(request);
@@ -117,7 +121,12 @@ describe('SignalrService', () => {
     });
 
     it('should not invoke when hubConnection is null', async () => {
-      const request = { conversationId: 1, messageType: 'Text', content: 'hello', replyToMessageId: null };
+      const request = {
+        conversationId: 1,
+        messageType: 'Text',
+        content: 'hello',
+        replyToMessageId: null,
+      };
 
       await service.sendMessage(request);
 

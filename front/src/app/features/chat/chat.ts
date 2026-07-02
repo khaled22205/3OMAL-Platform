@@ -20,30 +20,48 @@ import { MessageResponse } from './models/chat.models';
     MessageInputComponent,
   ],
   template: `
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-slate-50 dark:bg-slate-900 transition-colors duration-300 min-h-screen">
-      <div class="bg-white dark:bg-slate-950 rounded-2xl border border-slate-150 dark:border-slate-850 shadow-lg h-[75vh] flex overflow-hidden">
+    <div
+      class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-slate-50 dark:bg-slate-900 transition-colors duration-300 min-h-screen"
+    >
+      <div
+        class="bg-white dark:bg-slate-950 rounded-2xl border border-slate-150 dark:border-slate-850 shadow-lg h-[75vh] flex overflow-hidden"
+      >
         <!-- Conversation List -->
-        <div class="w-full md:w-80 lg:w-96 border-l border-slate-150 dark:border-slate-850 flex flex-col h-full"
-          [class.hidden]="store.activeConversation() && isMobileView()">
+        <div
+          class="w-full md:w-80 lg:w-96 border-l border-slate-150 dark:border-slate-850 flex flex-col h-full"
+          [class.hidden]="store.activeConversation() && isMobileView()"
+        >
           <app-conversation-list (conversationSelected)="onConversationSelected($event)" />
         </div>
 
         <!-- Message Area -->
-        <div class="flex-grow flex flex-col h-full bg-slate-50/50 dark:bg-slate-900/20"
-          [class.hidden]="!store.activeConversation() && isMobileView()">
+        <div
+          class="flex-grow flex flex-col h-full bg-slate-50/50 dark:bg-slate-900/20"
+          [class.hidden]="!store.activeConversation() && isMobileView()"
+        >
           @if (store.activeConversation(); as conv) {
             <app-chat-header (backClicked)="onBack()" />
             <app-message-feed
               (replyMsg)="onReply($event)"
               (editMsg)="onEdit($event)"
-              (deleteMsg)="onDelete($event)" />
+              (deleteMsg)="onDelete($event)"
+            />
             <app-message-input (sendMessage)="onSend($event)" />
           } @else {
-            <div class="flex-grow flex flex-col items-center justify-center text-center p-12 space-y-5">
-              <div class="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-4xl shadow-sm">&#x1F4AC;</div>
-              <h3 class="text-base sm:text-lg font-black text-slate-700 dark:text-slate-250">اختر محادثة للبدء في التواصل</h3>
+            <div
+              class="flex-grow flex flex-col items-center justify-center text-center p-12 space-y-5"
+            >
+              <div
+                class="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-4xl shadow-sm"
+              >
+                &#x1F4AC;
+              </div>
+              <h3 class="text-base sm:text-lg font-black text-slate-700 dark:text-slate-250">
+                اختر محادثة للبدء في التواصل
+              </h3>
               <p class="text-xs sm:text-sm text-slate-400 max-w-xs leading-relaxed">
-                اضغط على أي مستخدم في القائمة الجانبية لبدء المحادثة ومناقشة تفاصيل الحجز وأعمال الصيانة.
+                اضغط على أي مستخدم في القائمة الجانبية لبدء المحادثة ومناقشة تفاصيل الحجز وأعمال
+                الصيانة.
               </p>
             </div>
           }
@@ -63,7 +81,7 @@ export default class ChatComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.store.init();
 
-    this.route.queryParams.subscribe(async params => {
+    this.route.queryParams.subscribe(async (params) => {
       const withUserId = params['with'];
       const convId = params['conv'];
 
@@ -71,15 +89,20 @@ export default class ChatComponent implements OnInit, OnDestroy {
         try {
           const conv = await this.api.getConversation(Number(convId)).toPromise();
           if (conv) this.store.selectConversation(conv);
-        } catch { }
+        } catch {}
       } else if (withUserId) {
         try {
-          const conv = await this.api.createConversation({ participantUserId: Number(withUserId) }).toPromise();
+          const conv = await this.api
+            .createConversation({ participantUserId: Number(withUserId) })
+            .toPromise();
           if (conv) {
             this.store.selectConversation(conv);
-            this.router.navigate([], { queryParams: { conv: conv.id }, queryParamsHandling: 'merge' });
+            this.router.navigate([], {
+              queryParams: { conv: conv.id },
+              queryParamsHandling: 'merge',
+            });
           }
-        } catch { }
+        } catch {}
       }
     });
   }

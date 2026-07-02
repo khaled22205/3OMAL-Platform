@@ -64,18 +64,4 @@ export interface UnreadCountResponse {
   count: number;
 }
 
-export interface PagedResult<T> {
-  items: T[];
-  page: number;
-  pageSize: number;
-  totalCount: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
-
-export interface WrappedResponse<T> {
-  success: boolean;
-  data: T;
-  message: string | null;
-}
+export type { PagedResult, WrappedResponse } from '../../../core/models/api.models';

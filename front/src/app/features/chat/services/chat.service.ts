@@ -1,7 +1,6 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { environment } from '../../../../environments/environment';
+import { BaseApiService } from '../../../core/services/base-api.service';
 import {
   ConversationResponse,
   MessageResponse,
@@ -11,69 +10,69 @@ import {
   MarkAsReadRequest,
   UnreadCountResponse,
   PagedResult,
-  WrappedResponse,
 } from '../models/chat.models';
 
 @Injectable({ providedIn: 'root' })
-export class ChatApiService {
-  private http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/chat`;
+export class ChatApiService extends BaseApiService {
+  private readonly apiUrl = `${this.baseUrl}/chat`;
 
   getConversations(page = 1, pageSize = 20): Observable<PagedResult<ConversationResponse>> {
-    return this.http.get<WrappedResponse<PagedResult<ConversationResponse>>>(`${this.apiUrl}/conversations?page=${page}&pageSize=${pageSize}`)
-      .pipe(map(r => r.data));
+    return this.get<PagedResult<ConversationResponse>>(
+      `/chat/conversations?page=${page}&pageSize=${pageSize}`,
+    );
   }
 
   getConversation(id: number): Observable<ConversationResponse> {
-    return this.http.get<WrappedResponse<ConversationResponse>>(`${this.apiUrl}/conversations/${id}`)
-      .pipe(map(r => r.data));
+    return this.get<ConversationResponse>(`/chat/conversations/${id}`);
   }
 
   createConversation(request: CreateConversationRequest): Observable<ConversationResponse> {
-    return this.http.post<WrappedResponse<ConversationResponse>>(`${this.apiUrl}/conversations`, request)
-      .pipe(map(r => r.data));
+    return this.post<ConversationResponse>(`/chat/conversations`, request);
   }
 
-  getMessages(conversationId: number, page = 1, pageSize = 50): Observable<PagedResult<MessageResponse>> {
-    return this.http.get<WrappedResponse<PagedResult<MessageResponse>>>(
-      `${this.apiUrl}/conversations/${conversationId}/messages?page=${page}&pageSize=${pageSize}`)
-      .pipe(map(r => r.data));
+  getMessages(
+    conversationId: number,
+    page = 1,
+    pageSize = 50,
+  ): Observable<PagedResult<MessageResponse>> {
+    return this.get<PagedResult<MessageResponse>>(
+      `/chat/conversations/${conversationId}/messages?page=${page}&pageSize=${pageSize}`,
+    );
   }
 
   sendMessage(request: SendMessageRequest): Observable<MessageResponse> {
-    return this.http.post<WrappedResponse<MessageResponse>>(`${this.apiUrl}/messages`, request)
-      .pipe(map(r => r.data));
+    return this.post<MessageResponse>(`/chat/messages`, request);
   }
 
   editMessage(id: number, request: EditMessageRequest): Observable<MessageResponse> {
-    return this.http.put<WrappedResponse<MessageResponse>>(`${this.apiUrl}/messages/${id}`, request)
-      .pipe(map(r => r.data));
+    return this.put<MessageResponse>(`/chat/messages/${id}`, request);
   }
 
   deleteMessage(id: number): Observable<boolean> {
-    return this.http.delete<WrappedResponse<{ deleted: boolean }>>(`${this.apiUrl}/messages/${id}`)
-      .pipe(map(r => r.data.deleted));
+    return this.delete<{ deleted: boolean }>(`/chat/messages/${id}`).pipe(map((r) => r.deleted));
   }
 
   markAsRead(request: MarkAsReadRequest): Observable<boolean> {
-    return this.http.post<WrappedResponse<{ success: boolean }>>(`${this.apiUrl}/messages/read`, request)
-      .pipe(map(r => r.data.success));
+    return this.post<{ success: boolean }>(`/chat/messages/read`, request).pipe(map((r) => r.success));
   }
 
-  searchConversations(query: string, page = 1, pageSize = 20): Observable<PagedResult<ConversationResponse>> {
-    return this.http.get<WrappedResponse<PagedResult<ConversationResponse>>>(
-      `${this.apiUrl}/conversations/search?query=${encodeURIComponent(query)}&page=${page}&pageSize=${pageSize}`)
-      .pipe(map(r => r.data));
+  searchConversations(
+    query: string,
+    page = 1,
+    pageSize = 20,
+  ): Observable<PagedResult<ConversationResponse>> {
+    return this.get<PagedResult<ConversationResponse>>(
+      `/chat/conversations/search?query=${encodeURIComponent(query)}&page=${page}&pageSize=${pageSize}`,
+    );
   }
 
   searchMessages(query: string, page = 1, pageSize = 20): Observable<PagedResult<MessageResponse>> {
-    return this.http.get<WrappedResponse<PagedResult<MessageResponse>>>(
-      `${this.apiUrl}/messages/search?query=${encodeURIComponent(query)}&page=${page}&pageSize=${pageSize}`)
-      .pipe(map(r => r.data));
+    return this.get<PagedResult<MessageResponse>>(
+      `/chat/messages/search?query=${encodeURIComponent(query)}&page=${page}&pageSize=${pageSize}`,
+    );
   }
 
   getUnreadCount(): Observable<UnreadCountResponse> {
-    return this.http.get<WrappedResponse<UnreadCountResponse>>(`${this.apiUrl}/unread-count`)
-      .pipe(map(r => r.data));
+    return this.get<UnreadCountResponse>(`/chat/unread-count`);
   }
 }

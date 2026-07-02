@@ -2,11 +2,7 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { ChatApiService } from '../services/chat.service';
 import { SignalrService } from '../services/signalr.service';
 import { AuthService } from '../../../core/services/auth.service';
-import {
-  ConversationResponse,
-  MessageResponse,
-  SendMessageRequest,
-} from '../models/chat.models';
+import { ConversationResponse, MessageResponse, SendMessageRequest } from '../models/chat.models';
 import { Subscription } from 'rxjs';
 
 interface MessagesPage {
@@ -52,19 +48,25 @@ export class ChatStore {
     });
 
     this.subscriptions.push(
-      this.signalr.onNewMessage$.subscribe(msg => this.handleNewMessage(msg)),
-      this.signalr.onMessageEdited$.subscribe(msg => this.handleMessageEdited(msg)),
-      this.signalr.onMessageDeleted$.subscribe(data => this.handleMessageDeleted(data.messageId)),
-      this.signalr.onMessagesRead$.subscribe(data => this.handleMessagesRead(data.conversationId, data.messageIds)),
-      this.signalr.onUserTyping$.subscribe(data => this.handleUserTyping(data.conversationId, data.userId)),
-      this.signalr.onUserStoppedTyping$.subscribe(data => this.handleUserStoppedTyping(data.conversationId, data.userId)),
-      this.signalr.onUserOnline$.subscribe(userId => this.handleUserOnline(userId)),
-      this.signalr.onUserOffline$.subscribe(userId => this.handleUserOffline(userId)),
+      this.signalr.onNewMessage$.subscribe((msg) => this.handleNewMessage(msg)),
+      this.signalr.onMessageEdited$.subscribe((msg) => this.handleMessageEdited(msg)),
+      this.signalr.onMessageDeleted$.subscribe((data) => this.handleMessageDeleted(data.messageId)),
+      this.signalr.onMessagesRead$.subscribe((data) =>
+        this.handleMessagesRead(data.conversationId, data.messageIds),
+      ),
+      this.signalr.onUserTyping$.subscribe((data) =>
+        this.handleUserTyping(data.conversationId, data.userId),
+      ),
+      this.signalr.onUserStoppedTyping$.subscribe((data) =>
+        this.handleUserStoppedTyping(data.conversationId, data.userId),
+      ),
+      this.signalr.onUserOnline$.subscribe((userId) => this.handleUserOnline(userId)),
+      this.signalr.onUserOffline$.subscribe((userId) => this.handleUserOffline(userId)),
     );
   }
 
   destroy(): void {
-    this.subscriptions.forEach(s => s.unsubscribe());
+    this.subscriptions.forEach((s) => s.unsubscribe());
     this.signalr.stopConnection();
   }
 
@@ -92,10 +94,10 @@ export class ChatStore {
         if (this.conversationsPage() === 1) {
           this.conversations.set(result.items);
         } else {
-          this.conversations.update(items => [...items, ...result.items]);
+          this.conversations.update((items) => [...items, ...result.items]);
         }
         this.hasMoreConversations.set(result.hasNextPage);
-        this.conversationsPage.update(p => p + 1);
+        this.conversationsPage.update((p) => p + 1);
       }
     } finally {
       this.conversationsLoading.set(false);
@@ -112,10 +114,10 @@ export class ChatStore {
         if (this.messagesPage() === 1) {
           this.messages.set(result.items);
         } else {
-          this.messages.update(items => [...result.items, ...items]);
+          this.messages.update((items) => [...result.items, ...items]);
         }
         this.hasMoreMessages.set(result.hasNextPage);
-        this.messagesPage.update(p => p + 1);
+        this.messagesPage.update((p) => p + 1);
       }
     } finally {
       this.messagesLoading.set(false);
@@ -151,8 +153,8 @@ export class ChatStore {
 
   markAsRead(conv: ConversationResponse): void {
     const unreadMessages = this.messages()
-      .filter(m => m.senderId !== this.currentUserId() && !m.readAt)
-      .map(m => m.id);
+      .filter((m) => m.senderId !== this.currentUserId() && !m.readAt)
+      .map((m) => m.id);
     if (unreadMessages.length > 0) {
       this.signalr.markAsRead(conv.id, unreadMessages);
     }
@@ -176,7 +178,7 @@ export class ChatStore {
     try {
       const result = await this.api.getUnreadCount().toPromise();
       if (result) this.unreadCount.set(result.count);
-    } catch { }
+    } catch {}
   }
 
   async searchConversations(query: string): Promise<ConversationResponse[]> {
@@ -200,11 +202,11 @@ export class ChatStore {
   private handleNewMessage(msg: MessageResponse): void {
     const activeConv = this.activeConversation();
     if (activeConv && msg.conversationId === activeConv.id) {
-      this.messages.update(items => [...items, msg]);
+      this.messages.update((items) => [...items, msg]);
       this.markAsRead(activeConv);
     }
-    this.conversations.update(convs => {
-      const idx = convs.findIndex(c => c.id === msg.conversationId);
+    this.conversations.update((convs) => {
+      const idx = convs.findIndex((c) => c.id === msg.conversationId);
       if (idx >= 0) {
         const updated = { ...convs[idx], lastMessage: msg, lastMessageAt: msg.createdAt };
         const newConvs = [...convs];
@@ -221,41 +223,51 @@ export class ChatStore {
   }
 
   private handleMessageEdited(msg: MessageResponse): void {
-    this.messages.update(items =>
-      items.map(m => m.id === msg.id ? { ...m, content: msg.content, isEdited: true, editedAt: msg.editedAt } : m)
+    this.messages.update((items) =>
+      items.map((m) =>
+        m.id === msg.id
+          ? { ...m, content: msg.content, isEdited: true, editedAt: msg.editedAt }
+          : m,
+      ),
     );
-    this.conversations.update(convs =>
-      convs.map(c => c.lastMessage?.id === msg.id ? { ...c, lastMessage: { ...c.lastMessage!, content: msg.content } } : c)
+    this.conversations.update((convs) =>
+      convs.map((c) =>
+        c.lastMessage?.id === msg.id
+          ? { ...c, lastMessage: { ...c.lastMessage!, content: msg.content } }
+          : c,
+      ),
     );
   }
 
   private handleMessageDeleted(messageId: number): void {
-    this.messages.update(items =>
-      items.map(m => m.id === messageId ? { ...m, isDeleted: true, content: 'تم حذف الرسالة' } : m)
+    this.messages.update((items) =>
+      items.map((m) =>
+        m.id === messageId ? { ...m, isDeleted: true, content: 'تم حذف الرسالة' } : m,
+      ),
     );
   }
 
   private handleMessagesRead(conversationId: number, messageIds: number[]): void {
     const idSet = new Set(messageIds);
-    this.messages.update(items =>
-      items.map(m => idSet.has(m.id) ? { ...m, readAt: new Date().toISOString() } : m)
+    this.messages.update((items) =>
+      items.map((m) => (idSet.has(m.id) ? { ...m, readAt: new Date().toISOString() } : m)),
     );
-    this.conversations.update(convs =>
-      convs.map(c => c.id === conversationId ? { ...c, unreadCount: 0 } : c)
+    this.conversations.update((convs) =>
+      convs.map((c) => (c.id === conversationId ? { ...c, unreadCount: 0 } : c)),
     );
   }
 
   private handleUserTyping(conversationId: number, userId: number): void {
     const activeConv = this.activeConversation();
     if (activeConv?.id === conversationId && userId !== this.currentUserId()) {
-      this.typingUserIds.update(set => new Set(set).add(userId));
+      this.typingUserIds.update((set) => new Set(set).add(userId));
     }
   }
 
   private handleUserStoppedTyping(conversationId: number, userId: number): void {
     const activeConv = this.activeConversation();
     if (activeConv?.id === conversationId) {
-      this.typingUserIds.update(set => {
+      this.typingUserIds.update((set) => {
         const newSet = new Set(set);
         newSet.delete(userId);
         return newSet;
@@ -264,11 +276,11 @@ export class ChatStore {
   }
 
   private handleUserOnline(userId: number): void {
-    this.onlineUserIds.update(set => new Set(set).add(userId));
+    this.onlineUserIds.update((set) => new Set(set).add(userId));
   }
 
   private handleUserOffline(userId: number): void {
-    this.onlineUserIds.update(set => {
+    this.onlineUserIds.update((set) => {
       const newSet = new Set(set);
       newSet.delete(userId);
       return newSet;

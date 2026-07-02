@@ -16,10 +16,18 @@ describe('AuthService', () => {
         let store: Record<string, string> = {};
         return {
           getItem: (key: string) => store[key] ?? null,
-          setItem: (key: string, value: string) => { store[key] = value; },
-          removeItem: (key: string) => { delete store[key]; },
-          clear: () => { store = {}; },
-          get length() { return Object.keys(store).length; },
+          setItem: (key: string, value: string) => {
+            store[key] = value;
+          },
+          removeItem: (key: string) => {
+            delete store[key];
+          },
+          clear: () => {
+            store = {};
+          },
+          get length() {
+            return Object.keys(store).length;
+          },
           key: (_: number) => null,
         };
       })(),
@@ -47,16 +55,26 @@ describe('AuthService', () => {
           accessToken: 'abc',
           refreshToken: 'def',
           expiresAt: new Date().toISOString(),
-          user: { id: 1, firstName: 'John', lastName: 'Doe', email: 'john@test.com', phoneNumber: null, roles: ['Customer'] },
+          user: {
+            id: 1,
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'john@test.com',
+            phoneNumber: null,
+            roles: ['Customer'],
+          },
         },
         message: null,
       };
       http.post.mockReturnValue(of(mockResponse));
 
       let result: any;
-      service.login({ email: 'john@test.com', password: '123456' }).subscribe(r => result = r);
+      service.login({ email: 'john@test.com', password: '123456' }).subscribe((r) => (result = r));
 
-      expect(http.post).toHaveBeenCalledWith(`${environment.apiUrl}/auth/login`, { email: 'john@test.com', password: '123456' });
+      expect(http.post).toHaveBeenCalledWith(`${environment.apiUrl}/auth/login`, {
+        email: 'john@test.com',
+        password: '123456',
+      });
     });
   });
 
@@ -71,24 +89,38 @@ describe('AuthService', () => {
           accessToken: 'abc',
           refreshToken: 'def',
           expiresAt: new Date().toISOString(),
-          user: { id: 1, firstName: 'John', lastName: 'Doe', email: 'john@test.com', phoneNumber: null, roles: ['Worker'] },
+          user: {
+            id: 1,
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'john@test.com',
+            phoneNumber: null,
+            roles: ['Worker'],
+          },
         },
         message: null,
       };
       http.post.mockReturnValue(of(mockResponse));
 
       let result: any;
-      service.register({
+      service
+        .register({
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'john@test.com',
+          password: '123456',
+          phoneNumber: '01000000000',
+          userType: 'Worker',
+        })
+        .subscribe((r) => (result = r));
+
+      expect(http.post).toHaveBeenCalledWith(`${environment.apiUrl}/auth/register`, {
         firstName: 'John',
         lastName: 'Doe',
         email: 'john@test.com',
         password: '123456',
         phoneNumber: '01000000000',
         userType: 'Worker',
-      }).subscribe(r => result = r);
-
-      expect(http.post).toHaveBeenCalledWith(`${environment.apiUrl}/auth/register`, {
-        firstName: 'John', lastName: 'Doe', email: 'john@test.com', password: '123456', phoneNumber: '01000000000', userType: 'Worker'
       });
     });
   });
@@ -96,7 +128,14 @@ describe('AuthService', () => {
   describe('logout', () => {
     it('should clear tokens and navigate to /login', () => {
       localStorage.setItem('access_token', 'abc');
-      service.user.set({ id: 1, firstName: 'John', lastName: 'Doe', email: 'john@test.com', phoneNumber: null, roles: ['Customer'] });
+      service.user.set({
+        id: 1,
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@test.com',
+        phoneNumber: null,
+        roles: ['Customer'],
+      });
 
       service.logout();
 
@@ -109,7 +148,14 @@ describe('AuthService', () => {
 
   describe('isAuthenticated', () => {
     it('should return true when user is set', () => {
-      service.user.set({ id: 1, firstName: 'John', lastName: 'Doe', email: 'john@test.com', phoneNumber: null, roles: ['Customer'] });
+      service.user.set({
+        id: 1,
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@test.com',
+        phoneNumber: null,
+        roles: ['Customer'],
+      });
       expect(service.isAuthenticated()).toBe(true);
     });
 
@@ -131,16 +177,25 @@ describe('AuthService', () => {
           accessToken: 'new-access',
           refreshToken: 'new-refresh',
           expiresAt: new Date().toISOString(),
-          user: { id: 1, firstName: 'John', lastName: 'Doe', email: 'john@test.com', phoneNumber: null, roles: ['Customer'] },
+          user: {
+            id: 1,
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'john@test.com',
+            phoneNumber: null,
+            roles: ['Customer'],
+          },
         },
         message: null,
       };
       http.post.mockReturnValue(of(mockResponse));
 
       let result: any;
-      service.refreshToken().subscribe(r => result = r);
+      service.refreshToken().subscribe((r) => (result = r));
 
-      expect(http.post).toHaveBeenCalledWith(`${environment.apiUrl}/auth/refresh`, { refreshToken: 'existing-refresh' });
+      expect(http.post).toHaveBeenCalledWith(`${environment.apiUrl}/auth/refresh`, {
+        refreshToken: 'existing-refresh',
+      });
     });
   });
 

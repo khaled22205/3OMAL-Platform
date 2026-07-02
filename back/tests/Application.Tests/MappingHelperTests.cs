@@ -29,7 +29,7 @@ public class ToUserInfoTests
     [Fact]
     public void Should_handle_null_phone()
     {
-        var result =         (1, "test@test.com", (string?)null, new List<string>()).ToUserInfo();
+        var result = (1, "test@test.com", (string?)null, new List<string>()).ToUserInfo();
         result.PhoneNumber.Should().BeNull();
     }
 }

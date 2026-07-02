@@ -52,7 +52,10 @@ public class AuthServiceTests
 
         var result = await service.RegisterAsync(new RegisterRequest
         {
-            Email = "test@test.com", Password = "pass123", PhoneNumber = "1234567890", UserType = "Customer"
+            Email = "test@test.com",
+            Password = "pass123",
+            PhoneNumber = "1234567890",
+            UserType = "Customer"
         });
 
         result.Success.Should().BeFalse();
@@ -71,7 +74,10 @@ public class AuthServiceTests
 
         var result = await service.RegisterAsync(new RegisterRequest
         {
-            Email = "test@test.com", Password = "pass123", PhoneNumber = "1234567890", UserType = "Customer"
+            Email = "test@test.com",
+            Password = "pass123",
+            PhoneNumber = "1234567890",
+            UserType = "Customer"
         });
 
         result.Success.Should().BeFalse();
@@ -93,7 +99,10 @@ public class AuthServiceTests
 
         var result = await service.RegisterAsync(new RegisterRequest
         {
-            Email = "worker@test.com", Password = "pass123", PhoneNumber = "1234567890", UserType = "Worker"
+            Email = "worker@test.com",
+            Password = "pass123",
+            PhoneNumber = "1234567890",
+            UserType = "Worker"
         });
 
         result.Success.Should().BeTrue();
@@ -116,7 +125,10 @@ public class AuthServiceTests
 
         var result = await service.RegisterAsync(new RegisterRequest
         {
-            Email = "cust@test.com", Password = "pass123", PhoneNumber = "1234567890", UserType = "Customer"
+            Email = "cust@test.com",
+            Password = "pass123",
+            PhoneNumber = "1234567890",
+            UserType = "Customer"
         });
 
         result.Success.Should().BeTrue();

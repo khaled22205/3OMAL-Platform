@@ -26,20 +26,79 @@ describe('ChatStore', () => {
 
   const mockMessages: MessageResponse[] = [
     {
-      id: 1, conversationId: 1, senderId: 2, senderName: 'Ali Ahmed',
-      messageType: 'Text', content: 'Hello', replyToMessageId: null,
-      replyToContent: null, attachments: [], createdAt: new Date().toISOString(),
-      deliveredAt: null, readAt: null, editedAt: null, isEdited: false, isDeleted: false,
+      id: 1,
+      conversationId: 1,
+      senderId: 2,
+      senderName: 'Ali Ahmed',
+      messageType: 'Text',
+      content: 'Hello',
+      replyToMessageId: null,
+      replyToContent: null,
+      attachments: [],
+      createdAt: new Date().toISOString(),
+      deliveredAt: null,
+      readAt: null,
+      editedAt: null,
+      isEdited: false,
+      isDeleted: false,
     },
   ];
 
   beforeEach(() => {
     mockApi = {
-      getConversations: vi.fn().mockReturnValue(of({ items: mockConversations, page: 1, pageSize: 20, totalCount: 1, totalPages: 1, hasNextPage: false, hasPreviousPage: false })),
-      getMessages: vi.fn().mockReturnValue(of({ items: mockMessages, page: 1, pageSize: 50, totalCount: 1, totalPages: 1, hasNextPage: false, hasPreviousPage: false })),
+      getConversations: vi
+        .fn()
+        .mockReturnValue(
+          of({
+            items: mockConversations,
+            page: 1,
+            pageSize: 20,
+            totalCount: 1,
+            totalPages: 1,
+            hasNextPage: false,
+            hasPreviousPage: false,
+          }),
+        ),
+      getMessages: vi
+        .fn()
+        .mockReturnValue(
+          of({
+            items: mockMessages,
+            page: 1,
+            pageSize: 50,
+            totalCount: 1,
+            totalPages: 1,
+            hasNextPage: false,
+            hasPreviousPage: false,
+          }),
+        ),
       getUnreadCount: vi.fn().mockReturnValue(of({ count: 0 })),
-      searchConversations: vi.fn().mockReturnValue(of({ items: [], page: 1, pageSize: 20, totalCount: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false })),
-      searchMessages: vi.fn().mockReturnValue(of({ items: [], page: 1, pageSize: 20, totalCount: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false })),
+      searchConversations: vi
+        .fn()
+        .mockReturnValue(
+          of({
+            items: [],
+            page: 1,
+            pageSize: 20,
+            totalCount: 0,
+            totalPages: 0,
+            hasNextPage: false,
+            hasPreviousPage: false,
+          }),
+        ),
+      searchMessages: vi
+        .fn()
+        .mockReturnValue(
+          of({
+            items: [],
+            page: 1,
+            pageSize: 20,
+            totalCount: 0,
+            totalPages: 0,
+            hasNextPage: false,
+            hasPreviousPage: false,
+          }),
+        ),
     };
 
     const isConnected = signal(false);
@@ -65,7 +124,14 @@ describe('ChatStore', () => {
     };
 
     mockAuth = {
-      user: signal({ id: 1, firstName: 'Test', lastName: 'User', email: 'test@test.com', phoneNumber: null, roles: ['Customer'] }),
+      user: signal({
+        id: 1,
+        firstName: 'Test',
+        lastName: 'User',
+        email: 'test@test.com',
+        phoneNumber: null,
+        roles: ['Customer'],
+      }),
       getAccessToken: vi.fn().mockReturnValue('token'),
     };
 
@@ -88,9 +154,9 @@ describe('ChatStore', () => {
 
   it('should initialize conversations on init', async () => {
     vi.spyOn(store, 'loadConversations').mockImplementation(() => Promise.resolve());
-    
+
     store.init();
-    
+
     expect(mockSignalr.startConnection).toHaveBeenCalled();
   });
 
@@ -143,7 +209,7 @@ describe('ChatStore', () => {
 
   it('should mark messages as read', async () => {
     store.selectConversation(mockConversations[0]);
-    await new Promise(resolve => setTimeout(resolve, 0));
+    await new Promise((resolve) => setTimeout(resolve, 0));
     store.markAsRead(mockConversations[0]);
     expect(mockSignalr.markAsRead).toHaveBeenCalled();
   });

@@ -17,10 +17,7 @@ function isAuthRequest(url: string): boolean {
   return authExcludedPaths.some((path) => url.includes(path));
 }
 
-function addTokenHeader(
-  request: HttpRequest<unknown>,
-  token: string,
-): HttpRequest<unknown> {
+function addTokenHeader(request: HttpRequest<unknown>, token: string): HttpRequest<unknown> {
   return request.clone({
     setHeaders: { Authorization: `Bearer ${token}` },
   });
@@ -51,11 +48,7 @@ export const authInterceptor: HttpInterceptorFn = (
   );
 };
 
-function handle401Error(
-  req: HttpRequest<unknown>,
-  next: HttpHandlerFn,
-  authService: AuthService,
-) {
+function handle401Error(req: HttpRequest<unknown>, next: HttpHandlerFn, authService: AuthService) {
   if (!isRefreshing) {
     isRefreshing = true;
     refreshTokenSubject.next(null);

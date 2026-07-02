@@ -12,12 +12,7 @@ import {
   ChangePasswordRequest,
 } from '../models/auth.models';
 import { User, WorkerProfile } from '../models/interfaces';
-
-interface WrappedResponse<T> {
-  success: boolean;
-  data: T;
-  message: string | null;
-}
+import { WrappedResponse } from '../models/api.models';
 
 interface MeResponse {
   userId: number;
@@ -48,9 +43,13 @@ export class AuthService {
       name: `${u.firstName} ${u.lastName}`.trim() || u.email,
       email: u.email,
       phone: u.phoneNumber || '',
-      role: u.roles.includes('Worker') ? 'worker' : u.roles.includes('Customer') ? 'client' : 'client',
+      role: u.roles.includes('Worker')
+        ? 'worker'
+        : u.roles.includes('Customer')
+          ? 'client'
+          : 'client',
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
   });
 
@@ -110,9 +109,7 @@ export class AuthService {
   logout(): void {
     const refreshToken = this.getRefreshToken();
     if (refreshToken) {
-      this.http
-        .post(`${this.apiUrl}/logout`, { refreshToken })
-        .subscribe({ error: () => {} });
+      this.http.post(`${this.apiUrl}/logout`, { refreshToken }).subscribe({ error: () => {} });
     }
     this.clearTokens();
     this.user.set(null);
@@ -157,9 +154,9 @@ export class AuthService {
     if (roles.includes('Admin')) {
       this.router.navigate(['/admin']);
     } else if (roles.includes('Worker')) {
-      this.router.navigate(['/worker']);
+      this.router.navigate(['/worker-dashboard']);
     } else {
-      this.router.navigate(['/customer']);
+      this.router.navigate(['/customer-dashboard']);
     }
   }
 

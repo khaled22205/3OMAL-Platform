@@ -43,12 +43,23 @@ describe('ChatApiService', () => {
     const req = httpMock.expectOne(`${environment.apiUrl}/chat/conversations`);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({ participantUserId: 2 });
-    req.flush({ success: true, data: { id: 1, otherUser: { userId: 2, firstName: 'A', lastName: 'B', photo: null }, lastMessage: null, unreadCount: 0, lastMessageAt: null } });
+    req.flush({
+      success: true,
+      data: {
+        id: 1,
+        otherUser: { userId: 2, firstName: 'A', lastName: 'B', photo: null },
+        lastMessage: null,
+        unreadCount: 0,
+        lastMessageAt: null,
+      },
+    });
   });
 
   it('getMessages should call correct URL with params', () => {
     service.getMessages(1, 1, 50).subscribe();
-    const req = httpMock.expectOne(`${environment.apiUrl}/chat/conversations/1/messages?page=1&pageSize=50`);
+    const req = httpMock.expectOne(
+      `${environment.apiUrl}/chat/conversations/1/messages?page=1&pageSize=50`,
+    );
     expect(req.request.method).toBe('GET');
     req.flush({ success: true, data: { items: [], page: 1, pageSize: 50, totalCount: 0 } });
   });
@@ -61,11 +72,42 @@ describe('ChatApiService', () => {
   });
 
   it('sendMessage should POST to correct endpoint', () => {
-    service.sendMessage({ conversationId: 1, messageType: 'Text', content: 'hello', replyToMessageId: null }).subscribe();
+    service
+      .sendMessage({
+        conversationId: 1,
+        messageType: 'Text',
+        content: 'hello',
+        replyToMessageId: null,
+      })
+      .subscribe();
     const req = httpMock.expectOne(`${environment.apiUrl}/chat/messages`);
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ conversationId: 1, messageType: 'Text', content: 'hello', replyToMessageId: null });
-    req.flush({ success: true, data: { id: 1, conversationId: 1, senderId: 1, senderName: 'Test', messageType: 'Text', content: 'hello', replyToMessageId: null, replyToContent: null, attachments: [], createdAt: new Date().toISOString(), deliveredAt: null, readAt: null, editedAt: null, isEdited: false, isDeleted: false } });
+    expect(req.request.body).toEqual({
+      conversationId: 1,
+      messageType: 'Text',
+      content: 'hello',
+      replyToMessageId: null,
+    });
+    req.flush({
+      success: true,
+      data: {
+        id: 1,
+        conversationId: 1,
+        senderId: 1,
+        senderName: 'Test',
+        messageType: 'Text',
+        content: 'hello',
+        replyToMessageId: null,
+        replyToContent: null,
+        attachments: [],
+        createdAt: new Date().toISOString(),
+        deliveredAt: null,
+        readAt: null,
+        editedAt: null,
+        isEdited: false,
+        isDeleted: false,
+      },
+    });
   });
 
   it('deleteMessage should DELETE', () => {

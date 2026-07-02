@@ -8,7 +8,7 @@ import { ToastComponent } from './shared/components/toast/toast.component';
   selector: 'app-root',
   imports: [RouterOutlet, NavbarComponent, FooterComponent, ToastComponent],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
 export class App {
   protected readonly title = signal('3omal');

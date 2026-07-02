@@ -11,7 +11,10 @@
   <main class="app-content">
     <div class="welcome-card">
       <h2>Welcome, {{ user()?.firstName }}!</h2>
-      <p>You are signed in as <strong>{{ roles()[0] }}</strong>.</p>
+      <p>
+        You are signed in as <strong>{{ roles()[0] }}</strong
+        >.
+      </p>
       <ul class="info-list">
         <li><strong>Email:</strong> {{ user()?.email }}</li>
         <li><strong>User ID:</strong> {{ user()?.id }}</li>

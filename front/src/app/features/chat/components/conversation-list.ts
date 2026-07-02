@@ -29,16 +29,25 @@ import { formatConversationTime, truncateText } from '../utils/chat-utils';
         @for (conv of filteredConvs(); track conv.id) {
           <div
             (click)="selectConv(conv)"
-            [class]="(store.activeConversation()?.id === conv.id) ? 'bg-primary/5 border-r-4 border-primary' : 'hover:bg-slate-50 dark:hover:bg-slate-900/40'"
+            [class]="
+              store.activeConversation()?.id === conv.id
+                ? 'bg-primary/5 border-r-4 border-primary'
+                : 'hover:bg-slate-50 dark:hover:bg-slate-900/40'
+            "
             class="p-4 flex items-center gap-3 cursor-pointer transition-colors text-right"
           >
             <div class="relative flex-shrink-0">
               <img
-                [src]="conv.otherUser.photo || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'"
+                [src]="
+                  conv.otherUser.photo ||
+                  'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'
+                "
                 class="w-11 h-11 rounded-xl object-cover"
               />
               @if (isOnline(conv.otherUser.userId)) {
-                <span class="absolute bottom-0 right-0 w-3 h-3 bg-accent border-2 border-white dark:border-slate-950 rounded-full"></span>
+                <span
+                  class="absolute bottom-0 right-0 w-3 h-3 bg-accent border-2 border-white dark:border-slate-950 rounded-full"
+                ></span>
               }
             </div>
             <div class="flex-grow space-y-1 overflow-hidden">
@@ -50,16 +59,24 @@ import { formatConversationTime, truncateText } from '../utils/chat-utils';
                   {{ conv.otherUser.firstName }} {{ conv.otherUser.lastName }}
                 </h3>
               </div>
-              <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+              <div
+                class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400"
+              >
                 @if (conv.unreadCount > 0) {
-                  <span class="px-2 py-0.5 bg-primary text-white font-extrabold text-[10px] rounded-full">
+                  <span
+                    class="px-2 py-0.5 bg-primary text-white font-extrabold text-[10px] rounded-full"
+                  >
                     {{ conv.unreadCount }}
                   </span>
                 } @else {
                   <span></span>
                 }
                 <p class="truncate max-w-[160px] font-semibold leading-normal">
-                  {{ conv.lastMessage ? truncate(conv.lastMessage.content || '&#x1F4CE; مرفق', 30) : '' }}
+                  {{
+                    conv.lastMessage
+                      ? truncate(conv.lastMessage.content || '&#x1F4CE; مرفق', 30)
+                      : ''
+                  }}
                 </p>
               </div>
             </div>
@@ -92,7 +109,7 @@ export class ConversationListComponent {
     const all = this.store.conversations();
     const q = this.searchQuery.trim().toLowerCase();
     if (!q) return all;
-    return all.filter(c => {
+    return all.filter((c) => {
       const name = `${c.otherUser.firstName} ${c.otherUser.lastName}`.toLowerCase();
       return name.includes(q);
     });

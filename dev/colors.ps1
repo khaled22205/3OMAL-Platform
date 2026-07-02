@@ -1,0 +1,16 @@
+$Script:Colors = @{
+    Reset       = "`e[0m"
+    Bold        = "`e[1m"
+    Dim         = "`e[2m"
+    Red         = "`e[91m"
+    Green       = "`e[92m"
+    Yellow      = "`e[93m"
+    Blue        = "`e[94m"
+    Magenta     = "`e[95m"
+    Cyan        = "`e[96m"
+    White       = "`e[97m"
+    BgRed       = "`e[101m"
+    BgGreen     = "`e[102m"
+    BgYellow    = "`e[103m"
+    BgBlue      = "`e[104m"
+}

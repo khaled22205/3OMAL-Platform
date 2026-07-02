@@ -20,8 +20,12 @@
         />
         @if (form.controls.email.invalid && form.controls.email.touched) {
           <small class="error-text">
-            @if (form.controls.email.errors?.['required']) { Email is required }
-            @if (form.controls.email.errors?.['email']) { Enter a valid email }
+            @if (form.controls.email.errors?.['required']) {
+              Email is required
+            }
+            @if (form.controls.email.errors?.['email']) {
+              Enter a valid email
+            }
           </small>
         }
       </div>
@@ -37,7 +41,12 @@
             class="form-control"
             [class.is-invalid]="form.controls.password.invalid && form.controls.password.touched"
           />
-          <button type="button" class="toggle-password" (click)="togglePassword()" aria-label="Toggle password visibility">
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="togglePassword()"
+            aria-label="Toggle password visibility"
+          >
             {{ showPassword ? 'Hide' : 'Show' }}
           </button>
         </div>
@@ -46,7 +55,11 @@
         }
       </div>
 
-      <button type="submit" class="btn btn-primary btn-block" [disabled]="form.invalid || auth.loading()">
+      <button
+        type="submit"
+        class="btn btn-primary btn-block"
+        [disabled]="form.invalid || auth.loading()"
+      >
         @if (auth.loading()) {
           <span class="spinner"></span> Signing in...
         } @else {
@@ -55,8 +68,6 @@
       </button>
     </form>
 
-    <p class="auth-footer">
-      Don't have an account? <a routerLink="/register">Create one</a>
-    </p>
+    <p class="auth-footer">Don't have an account? <a routerLink="/register">Create one</a></p>
   </div>
 </div>

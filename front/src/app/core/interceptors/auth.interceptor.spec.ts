@@ -71,15 +71,17 @@ describe('authInterceptor', () => {
 
   it('handles 401 by refreshing token', () => {
     mockAuthService.getAccessToken.mockReturnValue('test-token');
-    mockAuthService.refreshToken.mockReturnValue(of({
-      success: true,
-      message: null,
-      errors: null,
-      accessToken: 'new-token',
-      refreshToken: 'new-refresh',
-      expiresAt: new Date().toISOString(),
-      user: { id: 1, firstName: '', lastName: '', email: '', phoneNumber: null, roles: [] },
-    }));
+    mockAuthService.refreshToken.mockReturnValue(
+      of({
+        success: true,
+        message: null,
+        errors: null,
+        accessToken: 'new-token',
+        refreshToken: 'new-refresh',
+        expiresAt: new Date().toISOString(),
+        user: { id: 1, firstName: '', lastName: '', email: '', phoneNumber: null, roles: [] },
+      }),
+    );
 
     httpClient.get('/api/test').subscribe();
 

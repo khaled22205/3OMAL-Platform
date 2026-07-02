@@ -2,6 +2,11 @@
   <header class="app-header">
     <h1 class="logo">3OMAL</h1>
     <nav class="nav-links">
+      <div class="tab-nav">
+        <button class="tab-btn" [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview')">Overview</button>
+        <button class="tab-btn" [class.active]="activeTab() === 'users'" (click)="activeTab.set('users')">Users</button>
+        <button class="tab-btn" [class.active]="activeTab() === 'reports'" (click)="activeTab.set('reports')">Reports</button>
+      </div>
       <span class="user-info">{{ user()?.firstName }} {{ user()?.lastName }}</span>
       <span class="role-badge">Admin</span>
       <button class="btn btn-outline" (click)="logout()">Logout</button>
@@ -9,27 +14,216 @@
   </header>
 
   <main class="app-content">
-    <div class="welcome-card">
-      <h2>Admin Dashboard</h2>
-      <p>Manage platform users, verify workers, and oversee operations.</p>
-      <div class="admin-grid">
-        <div class="admin-card">
-          <h3>Users</h3>
-          <p>Manage all registered users and their roles.</p>
-        </div>
-        <div class="admin-card">
-          <h3>Workers</h3>
-          <p>Review and approve worker profiles.</p>
-        </div>
-        <div class="admin-card">
-          <h3>Reports</h3>
-          <p>View platform analytics and reports.</p>
-        </div>
-        <div class="admin-card">
-          <h3>Settings</h3>
-          <p>Configure platform settings.</p>
-        </div>
+    @if (loading()) {
+      <div class="loading-state">Loading dashboard...</div>
+    } @else if (error()) {
+      <div class="error-state">
+        <p>{{ error() }}</p>
+        <button class="btn btn-primary" (click)="loadStats()">Retry</button>
       </div>
-    </div>
+    } @else {
+      @if (activeTab() === 'overview') {
+        <div class="welcome-card">
+          <h2>Admin Dashboard</h2>
+          <p>Manage platform users, verify workers, and oversee operations.</p>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-value">{{ stats()?.totalUsers }}</span>
+              <span class="stat-label">Total Users</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value">{{ stats()?.totalWorkers }}</span>
+              <span class="stat-label">Workers</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value">{{ stats()?.totalCustomers }}</span>
+              <span class="stat-label">Customers</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value">{{ stats()?.totalBookings }}</span>
+              <span class="stat-label">Total Bookings</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value">{{ stats()?.activeBookings }}</span>
+              <span class="stat-label">Active Bookings</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value">{{ stats()?.completedBookings }}</span>
+              <span class="stat-label">Completed</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value">{{ stats()?.totalRevenue }} EGP</span>
+              <span class="stat-label">Revenue</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value">{{ stats()?.totalCommission }} EGP</span>
+              <span class="stat-label">Commission</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value">{{ stats()?.totalCategories }}</span>
+              <span class="stat-label">Categories</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value">{{ stats()?.pendingApprovals }}</span>
+              <span class="stat-label">Pending Approvals</span>
+            </div>
+          </div>
+        </div>
+
+        @if (stats()?.topCategories?.length) {
+          <div class="welcome-card">
+            <h2>Top Categories</h2>
+            <div class="category-list">
+              @for (cat of stats()?.topCategories; track cat.categoryName) {
+                <div class="category-row">
+                  <span>{{ cat.categoryName }}</span>
+                  <span class="badge">{{ cat.bookingCount }} bookings</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+
+      @if (activeTab() === 'users') {
+        <div class="welcome-card">
+          <div class="card-header">
+            <h2>User Management</h2>
+            <button class="btn btn-outline" (click)="onExportUsers()">Export CSV</button>
+          </div>
+          <div class="search-bar">
+            <input
+              type="text"
+              placeholder="Search by email or name..."
+              [ngModel]="userSearch()"
+              (ngModelChange)="userSearch.set($event)"
+              (keyup.enter)="onSearchUsers()"
+              class="search-input"
+            />
+            <button class="btn btn-primary" (click)="onSearchUsers()">Search</button>
+          </div>
+          <div class="role-filters">
+            <button class="filter-btn" [class.active]="userRoleFilter() === ''" (click)="onFilterByRole('')">All</button>
+            <button class="filter-btn" [class.active]="userRoleFilter() === 'Admin'" (click)="onFilterByRole('Admin')">Admin</button>
+            <button class="filter-btn" [class.active]="userRoleFilter() === 'Worker'" (click)="onFilterByRole('Worker')">Worker</button>
+            <button class="filter-btn" [class.active]="userRoleFilter() === 'Customer'" (click)="onFilterByRole('Customer')">Customer</button>
+          </div>
+          <table class="user-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Roles</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (u of users(); track u.id) {
+                <tr>
+                  <td>{{ u.id }}</td>
+                  <td>{{ u.email }}</td>
+                  <td>{{ u.phoneNumber || '-' }}</td>
+                  <td>
+                    @for (role of u.roles; track role) {
+                      <span class="role-tag">{{ role }}</span>
+                    }
+                  </td>
+                  <td>
+                    @if (u.isLockedOut) {
+                      <span class="status-badge locked">Locked</span>
+                    } @else if (u.emailConfirmed) {
+                      <span class="status-badge active">Active</span>
+                    } @else {
+                      <span class="status-badge pending">Unconfirmed</span>
+                    }
+                  </td>
+                  <td class="actions-cell">
+                    <button class="btn btn-sm" (click)="onEditUser(u)">Edit</button>
+                    <button class="btn btn-sm btn-warning" (click)="onLockUser(u)">Lock</button>
+                    <button class="btn btn-sm btn-danger" (click)="onDeleteUser(u)">Delete</button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="6" class="empty-cell">No users found.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          <div class="pagination">
+            <button class="btn btn-sm" (click)="onPrevUserPage()" [disabled]="userPage() <= 1">Previous</button>
+            <span class="page-info">Page {{ userPage() }} of {{ totalUserPages() }} ({{ userTotal() }} total)</span>
+            <button class="btn btn-sm" (click)="onNextUserPage()" [disabled]="userPage() >= totalUserPages()">Next</button>
+          </div>
+        </div>
+
+        @if (editUser(); as u) {
+          <div class="modal-overlay" (click)="onCancelEdit()">
+            <div class="modal" (click)="$event.stopPropagation()">
+              <h3>Edit User: {{ u.email }}</h3>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" [(ngModel)]="editEmail" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label>Phone</label>
+                <input type="text" [(ngModel)]="editPhone" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label>Role</label>
+                <select [(ngModel)]="editRole" class="form-input">
+                  <option value="">Keep current</option>
+                  <option value="Admin">Admin</option>
+                  <option value="Worker">Worker</option>
+                  <option value="Customer">Customer</option>
+                </select>
+              </div>
+              <div class="modal-actions">
+                <button class="btn btn-primary" (click)="onSaveUser()">Save</button>
+                <button class="btn btn-outline" (click)="onCancelEdit()">Cancel</button>
+              </div>
+            </div>
+          </div>
+        }
+      }
+
+      @if (activeTab() === 'reports') {
+        <div class="welcome-card">
+          <h2>Reports & Exports</h2>
+          <p>Download platform data for external analysis.</p>
+          <div class="export-grid">
+            <div class="export-card">
+              <h3>Users Export</h3>
+              <p>Download all registered users data.</p>
+              <button class="btn btn-primary" (click)="onExportUsers()">Export Users</button>
+            </div>
+            <div class="export-card">
+              <h3>Bookings Export</h3>
+              <p>Download all booking records.</p>
+              <button class="btn btn-primary" (click)="onExportBookings()">Export Bookings</button>
+            </div>
+          </div>
+        </div>
+
+        @if (stats()?.monthlyBookings?.length) {
+          <div class="welcome-card">
+            <h2>Monthly Booking Trends</h2>
+            <div class="monthly-list">
+              @for (m of stats()?.monthlyBookings; track m.year + '-' + m.month) {
+                <div class="monthly-row">
+                  <span>{{ m.month }}/{{ m.year }}</span>
+                  <div class="bar-container">
+                    <div class="bar" [style.width.%]="(m.count / getMaxMonthlyCount()) * 100"></div>
+                  </div>
+                  <span class="badge">{{ m.count }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+    }
   </main>
 </div>

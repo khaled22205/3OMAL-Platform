@@ -10,12 +10,18 @@ export class SignalrService {
   private authService = inject(AuthService);
 
   private hubConnection: signalR.HubConnection | null = null;
-  readonly connectionState = signal<signalR.HubConnectionState>(signalR.HubConnectionState.Disconnected);
+  readonly connectionState = signal<signalR.HubConnectionState>(
+    signalR.HubConnectionState.Disconnected,
+  );
 
   private newMessageSubject = new Subject<MessageResponse>();
   private messageEditedSubject = new Subject<MessageResponse>();
   private messageDeletedSubject = new Subject<{ messageId: number; userId: number }>();
-  private messagesReadSubject = new Subject<{ conversationId: number; readByUserId: number; messageIds: number[] }>();
+  private messagesReadSubject = new Subject<{
+    conversationId: number;
+    readByUserId: number;
+    messageIds: number[];
+  }>();
   private userTypingSubject = new Subject<{ conversationId: number; userId: number }>();
   private userStoppedTypingSubject = new Subject<{ conversationId: number; userId: number }>();
   private userOnlineSubject = new Subject<number>();
@@ -23,10 +29,17 @@ export class SignalrService {
 
   readonly onNewMessage$: Observable<MessageResponse> = this.newMessageSubject.asObservable();
   readonly onMessageEdited$: Observable<MessageResponse> = this.messageEditedSubject.asObservable();
-  readonly onMessageDeleted$: Observable<{ messageId: number; userId: number }> = this.messageDeletedSubject.asObservable();
-  readonly onMessagesRead$: Observable<{ conversationId: number; readByUserId: number; messageIds: number[] }> = this.messagesReadSubject.asObservable();
-  readonly onUserTyping$: Observable<{ conversationId: number; userId: number }> = this.userTypingSubject.asObservable();
-  readonly onUserStoppedTyping$: Observable<{ conversationId: number; userId: number }> = this.userStoppedTypingSubject.asObservable();
+  readonly onMessageDeleted$: Observable<{ messageId: number; userId: number }> =
+    this.messageDeletedSubject.asObservable();
+  readonly onMessagesRead$: Observable<{
+    conversationId: number;
+    readByUserId: number;
+    messageIds: number[];
+  }> = this.messagesReadSubject.asObservable();
+  readonly onUserTyping$: Observable<{ conversationId: number; userId: number }> =
+    this.userTypingSubject.asObservable();
+  readonly onUserStoppedTyping$: Observable<{ conversationId: number; userId: number }> =
+    this.userStoppedTypingSubject.asObservable();
   readonly onUserOnline$: Observable<number> = this.userOnlineSubject.asObservable();
   readonly onUserOffline$: Observable<number> = this.userOfflineSubject.asObservable();
 
@@ -71,7 +84,12 @@ export class SignalrService {
     }
   }
 
-  async sendMessage(request: { conversationId: number; messageType: string; content: string | null; replyToMessageId: number | null }): Promise<void> {
+  async sendMessage(request: {
+    conversationId: number;
+    messageType: string;
+    content: string | null;
+    replyToMessageId: number | null;
+  }): Promise<void> {
     await this.hubConnection?.invoke('SendMessage', request);
   }
 
@@ -99,22 +117,34 @@ export class SignalrService {
     if (!this.hubConnection) return;
 
     this.hubConnection.on('NewMessage', (msg: MessageResponse) => this.newMessageSubject.next(msg));
-    this.hubConnection.on('MessageEdited', (msg: MessageResponse) => this.messageEditedSubject.next(msg));
+    this.hubConnection.on('MessageEdited', (msg: MessageResponse) =>
+      this.messageEditedSubject.next(msg),
+    );
     this.hubConnection.on('MessageDeleted', (messageId: number, userId: number) =>
-      this.messageDeletedSubject.next({ messageId, userId }));
-    this.hubConnection.on('MessagesRead', (conversationId: number, readByUserId: number, messageIds: number[]) =>
-      this.messagesReadSubject.next({ conversationId, readByUserId, messageIds }));
+      this.messageDeletedSubject.next({ messageId, userId }),
+    );
+    this.hubConnection.on(
+      'MessagesRead',
+      (conversationId: number, readByUserId: number, messageIds: number[]) =>
+        this.messagesReadSubject.next({ conversationId, readByUserId, messageIds }),
+    );
     this.hubConnection.on('UserTyping', (conversationId: number, userId: number) =>
-      this.userTypingSubject.next({ conversationId, userId }));
+      this.userTypingSubject.next({ conversationId, userId }),
+    );
     this.hubConnection.on('UserStoppedTyping', (conversationId: number, userId: number) =>
-      this.userStoppedTypingSubject.next({ conversationId, userId }));
+      this.userStoppedTypingSubject.next({ conversationId, userId }),
+    );
     this.hubConnection.on('UserOnline', (userId: number) => this.userOnlineSubject.next(userId));
     this.hubConnection.on('UserOffline', (userId: number) => this.userOfflineSubject.next(userId));
 
-    this.hubConnection.onreconnecting(() => this.connectionState.set(signalR.HubConnectionState.Reconnecting));
+    this.hubConnection.onreconnecting(() =>
+      this.connectionState.set(signalR.HubConnectionState.Reconnecting),
+    );
     this.hubConnection.onreconnected(async () => {
       this.connectionState.set(signalR.HubConnectionState.Connected);
     });
-    this.hubConnection.onclose(() => this.connectionState.set(signalR.HubConnectionState.Disconnected));
+    this.hubConnection.onclose(() =>
+      this.connectionState.set(signalR.HubConnectionState.Disconnected),
+    );
   }
 }

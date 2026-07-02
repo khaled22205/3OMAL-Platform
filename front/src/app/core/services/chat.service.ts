@@ -1,20 +1,31 @@
 import { Injectable, inject } from '@angular/core';
-import { MockDataService } from './mock-data.service';
+import { ChatApiService } from '../../features/chat/services/chat.service';
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
-  private mockData = inject(MockDataService);
-  conversations = this.mockData.conversations;
-  messages = this.mockData.messages;
+  private chatApi = inject(ChatApiService);
 
-  getMessagesBetween(userA: string, userB: string) {
-    return this.messages().filter(m =>
-      (m.senderId === userA && m.receiverId === userB) ||
-      (m.senderId === userB && m.receiverId === userA)
-    );
+  getConversations(page = 1, pageSize = 20) {
+    return this.chatApi.getConversations(page, pageSize);
   }
 
-  sendMessage(senderId: string, receiverId: string, content: string, image?: string) {
-    this.mockData.sendMessage(senderId, receiverId, content, image);
+  getMessages(conversationId: number, page = 1, pageSize = 50) {
+    return this.chatApi.getMessages(conversationId, page, pageSize);
+  }
+
+  sendMessage(request: { conversationId: number; content: string; mediaUrl?: string }) {
+    return this.chatApi.sendMessage(request);
+  }
+
+  searchConversations(query: string, page = 1, pageSize = 20) {
+    return this.chatApi.searchConversations(query, page, pageSize);
+  }
+
+  searchMessages(query: string, page = 1, pageSize = 20) {
+    return this.chatApi.searchMessages(query, page, pageSize);
+  }
+
+  getUnreadCount() {
+    return this.chatApi.getUnreadCount();
   }
 }

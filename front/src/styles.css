@@ -1,25 +1,26 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary: #F97316;
-  --color-primary-hover: #EA580C;
-  --color-primary-light: #FFEDD5;
-  --color-secondary: #1E293B;
-  --color-secondary-hover: #0F172A;
+  --color-primary: #f97316;
+  --color-primary-hover: #ea580c;
+  --color-primary-light: #ffedd5;
+  --color-secondary: #1e293b;
+  --color-secondary-hover: #0f172a;
   --color-secondary-light: #475569;
-  --color-accent: #10B981;
-  --color-accent-light: #D1FAE5;
+  --color-accent: #10b981;
+  --color-accent-light: #d1fae5;
   --color-accent-hover: #059669;
 
-  --font-cairo: "Cairo", sans-serif;
+  --font-cairo: 'Cairo', sans-serif;
 
   --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
   --shadow-glass-dark: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   font-family: 'Cairo', sans-serif;
@@ -27,7 +28,9 @@ html, body {
 }
 
 body {
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 ::-webkit-scrollbar {
@@ -71,8 +74,12 @@ body {
 }
 
 @keyframes skeleton-loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .skeleton {
