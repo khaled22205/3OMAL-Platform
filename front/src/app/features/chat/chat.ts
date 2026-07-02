@@ -1,6 +1,8 @@
-import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, DestroyRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { firstValueFrom } from 'rxjs';
 import { ChatStore } from './signals/chat.store';
 import { ChatApiService } from './services/chat.service';
 import { ConversationListComponent } from './components/conversation-list';
@@ -75,26 +77,27 @@ export default class ChatComponent implements OnInit, OnDestroy {
   private api = inject(ChatApiService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   private editingMessage = signal<MessageResponse | null>(null);
 
   ngOnInit(): void {
     this.store.init();
 
-    this.route.queryParams.subscribe(async (params) => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(async (params) => {
       const withUserId = params['with'];
       const convId = params['conv'];
 
       if (convId) {
         try {
-          const conv = await this.api.getConversation(Number(convId)).toPromise();
+          const conv = await firstValueFrom(this.api.getConversation(Number(convId)));
           if (conv) this.store.selectConversation(conv);
         } catch {}
       } else if (withUserId) {
         try {
-          const conv = await this.api
-            .createConversation({ participantUserId: Number(withUserId) })
-            .toPromise();
+          const conv = await firstValueFrom(
+            this.api.createConversation({ participantUserId: Number(withUserId) }),
+          );
           if (conv) {
             this.store.selectConversation(conv);
             this.router.navigate([], {

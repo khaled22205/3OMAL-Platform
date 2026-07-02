@@ -14,6 +14,6 @@ export class PaymentService extends BaseApiService {
   }
 
   refund(bookingId: number): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.baseUrl}/payments/${bookingId}/refund`, {});
+    return this.post<{ message: string }>(`/payments/${bookingId}/refund`, {});
   }
 }

@@ -1,4 +1,4 @@
-import { Component, input, computed } from '@angular/core';
+import { Component, input, computed, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -11,12 +11,21 @@ import { CommonModule } from '@angular/common';
       [ngClass]="sizeClass()"
     >
       @if (src(); as imgSrc) {
-        <img
-          [src]="imgSrc"
-          [alt]="alt()"
-          class="w-full h-full object-cover"
-          (error)="onError()"
-        />
+        @if (!imageError()) {
+          <img
+            [src]="imgSrc"
+            [alt]="alt()"
+            class="w-full h-full object-cover"
+            (error)="onError()"
+          />
+        } @else {
+          <span
+            class="font-bold text-white uppercase"
+            [ngClass]="textSizeClass()"
+          >
+            {{ initials() }}
+          </span>
+        }
       } @else {
         <span
           class="font-bold text-white uppercase"
@@ -35,7 +44,14 @@ export class AvatarComponent {
   readonly size = input<'sm' | 'md' | 'lg' | 'xl'>('md');
   readonly color = input<string>('bg-primary');
 
-  protected hasError = false;
+  protected imageError = signal(false);
+
+  constructor() {
+    effect(() => {
+      this.src();
+      this.imageError.set(false);
+    });
+  }
 
   protected sizeClass = computed(() => {
     switch (this.size()) {
@@ -64,6 +80,6 @@ export class AvatarComponent {
   });
 
   protected onError() {
-    this.hasError = true;
+    this.imageError.set(true);
   }
 }

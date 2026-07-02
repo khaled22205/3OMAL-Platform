@@ -30,10 +30,10 @@ export class ReviewService extends BaseApiService {
   }
 
   reply(id: number, request: WorkerReplyRequest): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.baseUrl}/reviews/${id}/reply`, request);
+    return this.post<{ message: string }>(`/reviews/${id}/reply`, request);
   }
 
   remove(id: number): Observable<{ message: string }> {
-    return super.delete<{ message: string }>(`/reviews/${id}`);
+    return this.delete<{ message: string }>(`/reviews/${id}`);
   }
 }

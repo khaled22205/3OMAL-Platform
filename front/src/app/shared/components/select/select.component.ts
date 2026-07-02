@@ -1,4 +1,4 @@
-import { Component, input, computed, forwardRef } from '@angular/core';
+import { Component, input, computed, forwardRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 
@@ -29,7 +29,7 @@ export interface SelectOption {
       <div class="relative">
         <select
           [value]="value"
-          [disabled]="disabled()"
+          [disabled]="isDisabled()"
           (change)="onSelect($event)"
           (blur)="onTouched()"
           class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border rounded-xl outline-none transition-all text-right font-bold text-slate-800 dark:text-white appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
@@ -67,11 +67,15 @@ export class SelectComponent implements ControlValueAccessor {
   readonly error = input<string>();
 
   protected value: string | number = '';
+  protected formDisabled = signal(false);
+  protected isDisabled = computed(() => this.disabled() || this.formDisabled());
   protected onChange: (value: string | number) => void = () => {};
   protected onTouched: () => void = () => {};
 
   protected onSelect(event: Event) {
-    this.value = (event.target as HTMLSelectElement).value;
+    const stringVal = (event.target as HTMLSelectElement).value;
+    const matched = this.options().find((o) => String(o.value) === stringVal);
+    this.value = matched ? matched.value : stringVal;
     this.onChange(this.value);
   }
 
@@ -88,6 +92,6 @@ export class SelectComponent implements ControlValueAccessor {
   }
 
   setDisabledState(isDisabled: boolean): void {
-    // handled by disabled() input
+    this.formDisabled.set(isDisabled);
   }
 }

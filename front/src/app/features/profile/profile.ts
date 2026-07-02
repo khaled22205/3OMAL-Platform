@@ -1,4 +1,5 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { WorkerService } from '../../core/services/worker.service';
@@ -14,7 +15,11 @@ import { ReviewResponse } from '../../core/models/review.models';
   imports: [CommonModule, RouterModule, DatePipe],
   template: `
     <div class="bg-slate-50 dark:bg-slate-900 transition-colors duration-300 pb-20 min-h-screen">
-      @if (worker(); as w) {
+      @if (loading()) {
+        <div class="flex justify-center items-center py-32">
+          <div class="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+        </div>
+      } @else { @if (worker(); as w) {
         <!-- COVER IMAGE -->
         <div
           class="h-48 sm:h-64 md:h-72 w-full bg-cover bg-center relative"
@@ -322,6 +327,7 @@ import { ReviewResponse } from '../../core/models/review.models';
           >
         </div>
       }
+      }
     </div>
   `,
 })
@@ -332,6 +338,7 @@ export default class ProfileComponent implements OnInit {
   private reviewService = inject(ReviewService);
   private authService = inject(AuthService);
   private toast = inject(ToastService);
+  private destroyRef = inject(DestroyRef);
 
   worker = signal<WorkerProfileResponse | null>(null);
   reviews = signal<ReviewResponse[]>([]);
@@ -343,12 +350,12 @@ export default class ProfileComponent implements OnInit {
   });
 
   ngOnInit() {
-    this.route.paramMap.subscribe((params) => {
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const id = params.get('id');
       if (id) {
         this.loading.set(true);
         const workerId = Number(id);
-        this.workerService.getById(workerId).subscribe({
+        this.workerService.getById(workerId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
           next: (w) => {
             this.worker.set(w);
             this.loading.set(false);
@@ -358,8 +365,9 @@ export default class ProfileComponent implements OnInit {
             this.loading.set(false);
           },
         });
-        this.reviewService.getWorkerReviews(workerId, 1, 10).subscribe({
+        this.reviewService.getWorkerReviews(workerId, 1, 10).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
           next: (res) => this.reviews.set(res.items),
+          error: () => {},
         });
       }
     });

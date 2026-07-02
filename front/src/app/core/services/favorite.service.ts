@@ -7,7 +7,7 @@ import { FavoriteResponse, AddFavoriteRequest } from '../models/favorite.models'
 @Injectable({ providedIn: 'root' })
 export class FavoriteService extends BaseApiService {
   getAll(page = 1, pageSize = 10): Observable<PagedResult<FavoriteResponse>> {
-    return this.get<PagedResult<FavoriteResponse>>(`/favorites?page=${page}&pageSize=${pageSize}`);
+    return this.get<PagedResult<FavoriteResponse>>('/favorites', { page, pageSize });
   }
 
   add(request: AddFavoriteRequest): Observable<FavoriteResponse> {

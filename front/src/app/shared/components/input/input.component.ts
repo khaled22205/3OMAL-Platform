@@ -1,4 +1,4 @@
-import { Component, input, output, computed, forwardRef } from '@angular/core';
+import { Component, input, output, computed, forwardRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 
@@ -25,7 +25,7 @@ import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
         [type]="type()"
         [placeholder]="placeholder()"
         [value]="value"
-        [disabled]="disabled()"
+        [disabled]="isDisabled()"
         (input)="onInput($event)"
         (blur)="onBlur()"
         class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border rounded-xl outline-none transition-all text-right font-bold text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -53,6 +53,8 @@ export class InputComponent implements ControlValueAccessor {
   readonly hint = input<string>();
 
   protected value = '';
+  protected formDisabled = signal(false);
+  protected isDisabled = computed(() => this.disabled() || this.formDisabled());
   protected onChange: (value: string) => void = () => {};
   protected onTouched: () => void = () => {};
 
@@ -78,6 +80,6 @@ export class InputComponent implements ControlValueAccessor {
   }
 
   setDisabledState(isDisabled: boolean): void {
-    // handled by disabled() input
+    this.formDisabled.set(isDisabled);
   }
 }

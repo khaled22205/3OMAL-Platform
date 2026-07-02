@@ -31,7 +31,7 @@ export class AdminService extends BaseApiService {
 
   lockUser(id: number, lockoutEnd?: string): Observable<{ message: string }> {
     const params = lockoutEnd ? `?lockoutEnd=${encodeURIComponent(lockoutEnd)}` : '';
-    return this.http.post<{ message: string }>(`${this.baseUrl}/admin/users/${id}/lock${params}`, {});
+    return this.post<{ message: string }>(`/admin/users/${id}/lock${params}`, {});
   }
 
   deleteUser(id: number): Observable<{ message: string }> {

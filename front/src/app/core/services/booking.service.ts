@@ -35,39 +35,39 @@ export class BookingService extends BaseApiService {
   }
 
   accept(id: number): Observable<BookingResponse> {
-    return this.http.patch<BookingResponse>(`${this.baseUrl}/bookings/${id}/accept`, {});
+    return this.patch<BookingResponse>(`/bookings/${id}/accept`, {});
   }
 
   reject(id: number, reason?: string): Observable<BookingResponse> {
-    const params = reason ? `?reason=${encodeURIComponent(reason)}` : '';
-    return this.http.patch<BookingResponse>(`${this.baseUrl}/bookings/${id}/reject${params}`, {});
+    const path = reason ? `/bookings/${id}/reject?reason=${encodeURIComponent(reason)}` : `/bookings/${id}/reject`;
+    return this.patch<BookingResponse>(path, {});
   }
 
   cancel(id: number, reason?: string): Observable<BookingResponse> {
-    const params = reason ? `?reason=${encodeURIComponent(reason)}` : '';
-    return this.http.patch<BookingResponse>(`${this.baseUrl}/bookings/${id}/cancel${params}`, {});
+    const path = reason ? `/bookings/${id}/cancel?reason=${encodeURIComponent(reason)}` : `/bookings/${id}/cancel`;
+    return this.patch<BookingResponse>(path, {});
   }
 
   reschedule(id: number, newScheduledAt: string): Observable<BookingResponse> {
-    return this.http.patch<BookingResponse>(
-      `${this.baseUrl}/bookings/${id}/reschedule?newScheduledAt=${encodeURIComponent(newScheduledAt)}`,
+    return this.patch<BookingResponse>(
+      `/bookings/${id}/reschedule?newScheduledAt=${encodeURIComponent(newScheduledAt)}`,
       {},
     );
   }
 
   markOnTheWay(id: number): Observable<BookingResponse> {
-    return this.http.patch<BookingResponse>(`${this.baseUrl}/bookings/${id}/on-the-way`, {});
+    return this.patch<BookingResponse>(`/bookings/${id}/on-the-way`, {});
   }
 
   startJob(id: number): Observable<BookingResponse> {
-    return this.http.patch<BookingResponse>(`${this.baseUrl}/bookings/${id}/start`, {});
+    return this.patch<BookingResponse>(`/bookings/${id}/start`, {});
   }
 
   pauseJob(id: number): Observable<BookingResponse> {
-    return this.http.patch<BookingResponse>(`${this.baseUrl}/bookings/${id}/pause`, {});
+    return this.patch<BookingResponse>(`/bookings/${id}/pause`, {});
   }
 
   completeJob(id: number): Observable<BookingResponse> {
-    return this.http.patch<BookingResponse>(`${this.baseUrl}/bookings/${id}/complete`, {});
+    return this.patch<BookingResponse>(`/bookings/${id}/complete`, {});
   }
 }

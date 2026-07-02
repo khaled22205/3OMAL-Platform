@@ -30,10 +30,10 @@ export class WorkerServiceService extends BaseApiService {
   }
 
   remove(id: number): Observable<{ message: string }> {
-    return super.delete<{ message: string }>(`/services/${id}`);
+    return this.delete<{ message: string }>(`/services/${id}`);
   }
 
   toggleActive(id: number): Observable<{ message: string }> {
-    return this.http.patch<{ message: string }>(`${this.baseUrl}/services/${id}/toggle-active`, {});
+    return this.patch<{ message: string }>(`/services/${id}/toggle-active`, {});
   }
 }

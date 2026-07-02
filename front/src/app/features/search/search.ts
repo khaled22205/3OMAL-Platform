@@ -2,7 +2,7 @@ import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
+import { Subject, debounceTime, switchMap, takeUntil } from 'rxjs';
 import { CategoryService } from '../../core/services/category.service';
 import { WorkerService } from '../../core/services/worker.service';
 import { CategoryTreeResponse } from '../../core/models/category.models';
@@ -376,11 +376,11 @@ export default class SearchComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit() {
-    this.categoryService.getTree().subscribe({
+    this.categoryService.getTree().pipe(takeUntil(this.destroy$)).subscribe({
       next: (cats) => this.categories.set(cats),
     });
 
-    this.route.queryParams.subscribe((params) => {
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       this.filterService = params['service'] || '';
       this.filterGov = params['gov'] || '';
       this.filterArea = params['area'] || '';
@@ -390,7 +390,7 @@ export default class SearchComponent implements OnInit, OnDestroy {
 
     this.searchSubject.pipe(
       debounceTime(300),
-      distinctUntilChanged(),
+      takeUntil(this.destroy$),
     ).subscribe(() => this.executeSearch());
   }
 

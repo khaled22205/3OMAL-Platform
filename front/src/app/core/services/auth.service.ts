@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
-import { tap, Observable, map } from 'rxjs';
+import { tap, Observable, map, switchMap, catchError, of, finalize } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   AuthResponse,
@@ -138,7 +138,9 @@ export class AuthService {
   }
 
   changePassword(request: ChangePasswordRequest): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/change-password`, request);
+    return this.http
+      .post<WrappedResponse<void>>(`${this.apiUrl}/change-password`, request)
+      .pipe(map((w) => w.data));
   }
 
   getAccessToken(): string | null {
@@ -160,27 +162,29 @@ export class AuthService {
     }
   }
 
-  restoreSession(): void {
+  restoreSession(): Observable<boolean> {
     const token = this.getAccessToken();
-    if (!token) return;
+    if (!token) return of(false);
     this.loading.set(true);
-    this.getCurrentUser().subscribe({
-      next: (res) => {
+    return this.getCurrentUser().pipe(
+      switchMap((res) => {
         if (res.success && res.user) {
           this.user.set(res.user);
-        } else {
-          this.refreshToken().subscribe({
-            next: () => {},
-            error: () => this.logout(),
-          });
+          this.loading.set(false);
+          return of(true);
         }
+        return this.refreshToken().pipe(
+          map(() => true),
+          finalize(() => this.loading.set(false)),
+        );
+      }),
+      catchError(() => {
         this.loading.set(false);
-      },
-      error: () => {
-        this.loading.set(false);
-        this.logout();
-      },
-    });
+        this.clearTokens();
+        this.user.set(null);
+        return of(false);
+      }),
+    );
   }
 
   private handleAuthResponse(res: AuthResponse): void {

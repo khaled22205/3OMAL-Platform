@@ -548,19 +548,20 @@ export default class Home implements OnInit {
 
   availableAreas = computed(() => {
     const gov = this.governorates.find((g) => g.name === this.searchGov);
-    if (gov) {
-      this.searchArea = '';
-      return gov.areas;
-    }
-    return [];
+    return gov ? gov.areas : [];
   });
 
   ngOnInit() {
     this.categoryService.getTree().subscribe({
       next: (cats) => this.categories.set(cats),
+      error: () => this.loading.set(false),
     });
     this.workerService.search({ page: 1, pageSize: 4, sortBy: 'rating' }).subscribe({
-      next: (res) => this.topWorkers.set(res.items),
+      next: (res) => {
+        this.topWorkers.set(res.items);
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false),
     });
   }
 

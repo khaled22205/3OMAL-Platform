@@ -32,4 +32,10 @@ export class BaseApiService {
       .delete<WrappedResponse<T>>(`${this.baseUrl}${path}`)
       .pipe(map((r) => r.data));
   }
+
+  protected patch<T>(path: string, body?: unknown): Observable<T> {
+    return this.http
+      .patch<WrappedResponse<T>>(`${this.baseUrl}${path}`, body)
+      .pipe(map((r) => r.data));
+  }
 }

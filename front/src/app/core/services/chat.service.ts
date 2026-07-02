@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { SendMessageRequest } from '../../features/chat/models/chat.models';
 import { ChatApiService } from '../../features/chat/services/chat.service';
 
 @Injectable({ providedIn: 'root' })
@@ -14,7 +15,13 @@ export class ChatService {
   }
 
   sendMessage(request: { conversationId: number; content: string; mediaUrl?: string }) {
-    return this.chatApi.sendMessage(request);
+    const payload: SendMessageRequest = {
+      conversationId: request.conversationId,
+      messageType: request.mediaUrl ? 'Image' : 'Text',
+      content: request.content || null,
+      replyToMessageId: null,
+    };
+    return this.chatApi.sendMessage(payload);
   }
 
   searchConversations(query: string, page = 1, pageSize = 20) {

@@ -10,7 +10,7 @@ export class CategoryService extends BaseApiService {
   }
 
   getTree(): Observable<CategoryTreeResponse[]> {
-    return this.get<CategoryTreeResponse[]>('/categories');
+    return this.get<CategoryTreeResponse[]>('/categories/tree');
   }
 
   getById(id: number): Observable<CategoryResponse> {
@@ -26,10 +26,10 @@ export class CategoryService extends BaseApiService {
   }
 
   remove(id: number): Observable<{ message: string }> {
-    return super.delete<{ message: string }>(`/categories/${id}`);
+    return this.delete<{ message: string }>(`/categories/${id}`);
   }
 
   toggleActive(id: number): Observable<{ message: string }> {
-    return this.http.patch<{ message: string }>(`${this.baseUrl}/categories/${id}/toggle-active`, {});
+    return this.patch<{ message: string }>(`/categories/${id}/toggle-active`, {});
   }
 }

@@ -1,4 +1,4 @@
-import { Component, input, output, HostListener, signal } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -93,14 +93,12 @@ export class FileUploadComponent {
   protected isDragging = signal(false);
   protected preview = signal<{ name: string; type: string; url: string }[]>([]);
 
-  @HostListener('document:Dragover', ['$event'])
   protected onDragOver(event: Event) {
     event.preventDefault();
     event.stopPropagation();
     this.isDragging.set(true);
   }
 
-  @HostListener('document:Dragleave', ['$event'])
   protected onDragLeave(event: Event) {
     event.preventDefault();
     event.stopPropagation();

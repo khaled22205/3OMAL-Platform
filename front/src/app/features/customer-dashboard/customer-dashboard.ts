@@ -252,7 +252,8 @@ interface FavoriteDisplay {
                       <label class="text-xs font-bold text-slate-500">الاسم بالكامل</label
                       ><input
                         type="text"
-                        [(ngModel)]="profileName"
+                        [ngModel]="profileName()"
+                        (ngModelChange)="profileName.set($event)"
                         name="name"
                         class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 text-xs sm:text-sm outline-none text-right font-semibold"
                       />
@@ -261,7 +262,8 @@ interface FavoriteDisplay {
                       <label class="text-xs font-bold text-slate-500">رقم الهاتف</label
                       ><input
                         type="text"
-                        [(ngModel)]="profilePhone"
+                        [ngModel]="profilePhone()"
+                        (ngModelChange)="profilePhone.set($event)"
                         name="phone"
                         class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 text-xs sm:text-sm outline-none text-right font-semibold"
                       />
@@ -271,7 +273,8 @@ interface FavoriteDisplay {
                     <label class="text-xs font-bold text-slate-500">البريد الإلكتروني</label
                     ><input
                       type="email"
-                      [(ngModel)]="profileEmail"
+                      [ngModel]="profileEmail()"
+                      (ngModelChange)="profileEmail.set($event)"
                       name="email"
                       class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 text-xs sm:text-sm outline-none text-right font-semibold"
                     />
@@ -379,9 +382,9 @@ export default class CustomerDashboard implements OnInit {
 
   currentUser = this.authService.currentUser;
 
-  profileName = this.currentUser()?.name || '';
-  profilePhone = this.currentUser()?.phone || '';
-  profileEmail = this.currentUser()?.email || '';
+  profileName = signal(this.currentUser()?.name || '');
+  profilePhone = signal(this.currentUser()?.phone || '');
+  profileEmail = signal(this.currentUser()?.email || '');
 
   userBookings = computed<Booking[]>(() => {
     return this.allBookings().map((b) => ({
@@ -492,9 +495,12 @@ export default class CustomerDashboard implements OnInit {
   onSaveProfile() {
     const user = this.authService.user();
     if (user) {
-      user.firstName = this.profileName;
-      user.phoneNumber = this.profilePhone;
-      user.email = this.profileEmail;
+      this.authService.user.set({
+        ...user,
+        firstName: this.profileName(),
+        phoneNumber: this.profilePhone(),
+        email: this.profileEmail(),
+      });
     }
     this.toast.show('تم تحديث بياناتك الشخصية بنجاح.', 'success');
   }

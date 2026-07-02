@@ -125,18 +125,18 @@ import { WorkerProfileResponse } from '../../core/models/worker.models';
                   ٢. اختر الوقت المفضل
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                  @for (time of timeSlots; track time) {
+                  @for (slot of timeSlots; track slot.value) {
                     <button
                       type="button"
-                      (click)="selectedTime = time"
+                      (click)="selectedTime = slot.value"
                       [class]="
-                        selectedTime === time
+                        selectedTime === slot.value
                           ? 'border-primary bg-primary/10 text-primary font-extrabold'
                           : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-400'
                       "
                       class="py-3 px-4 rounded-xl border border-solid text-xs text-center transition-all cursor-pointer bg-white/20 dark:bg-slate-900/40"
                     >
-                      {{ time }}
+                      {{ slot.label }}
                     </button>
                   }
                 </div>
@@ -252,7 +252,7 @@ export default class BookingComponent implements OnInit {
   submitting = signal(false);
 
   selectedDate = '';
-  selectedTime = '١٢:٠٠ م - ٠٢:٠٠ م';
+  selectedTime = '12:00';
   address = '';
   description = '';
   uploadedCount = signal<number>(0);
@@ -261,11 +261,11 @@ export default class BookingComponent implements OnInit {
   dateSlots: Array<{ date: string; dayName: string; dayNum: number; monthName: string }> = [];
 
   timeSlots = [
-    '١٠:٠٠ ص - ١٢:٠٠ م',
-    '١٢:٠٠ م - ٠٢:٠٠ م',
-    '٠٢:٠٠ م - ٠٤:٠٠ م',
-    '٠٤:٠٠ م - ٠٦:٠٠ م',
-    '٠٦:٠٠ م - ٠٨:٠٠ م',
+    { label: '١٠:٠٠ ص - ١٢:٠٠ م', value: '10:00' },
+    { label: '١٢:٠٠ م - ٠٢:٠٠ م', value: '12:00' },
+    { label: '٠٢:٠٠ م - ٠٤:٠٠ م', value: '14:00' },
+    { label: '٠٤:٠٠ م - ٠٦:٠٠ م', value: '16:00' },
+    { label: '٠٦:٠٠ م - ٠٨:٠٠ م', value: '18:00' },
   ];
 
   ngOnInit() {
@@ -321,7 +321,7 @@ export default class BookingComponent implements OnInit {
     this.submitting.set(true);
     this.bookingService.create({
       workerProfileId: w.id,
-      scheduledAt: new Date(this.selectedDate + 'T12:00:00').toISOString(),
+      scheduledAt: new Date(this.selectedDate + 'T' + this.selectedTime + ':00').toISOString(),
       address: this.address,
       notes: this.description,
     }).subscribe({

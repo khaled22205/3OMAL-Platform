@@ -45,7 +45,7 @@ export class WorkerService extends BaseApiService {
   }
 
   updateAvailability(request: WorkerStatusRequest): Observable<{ message: string }> {
-    return this.http.patch<{ message: string }>(`${this.baseUrl}/workers/availability`, request);
+    return this.patch<{ message: string }>(`/workers/availability`, request);
   }
 
   addAvailabilitySlot(request: WorkerAvailabilityRequest): Observable<WorkerAvailabilityResponse> {
