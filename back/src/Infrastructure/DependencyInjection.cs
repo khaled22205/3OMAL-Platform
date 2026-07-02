@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Application.Common.Interfaces;
+using Application.Features.AiAssistant;
+using Infrastructure.Configuration;
 using Infrastructure.Data;
 using Infrastructure.Data.Seed;
 using Infrastructure.FileStorage;
@@ -40,6 +42,17 @@ public static class DependencyInjection
         services.AddScoped<Application.Features.Admin.IAdminService, AdminService>();
         services.AddScoped<Application.Features.Chat.IChatService, ChatService>();
         services.AddSingleton<ConnectionManager>();
+
+        services.Configure<AiAssistantOptions>(configuration.GetSection(AiAssistantOptions.SectionName));
+        services.Configure<GeminiOptions>(configuration.GetSection(GeminiOptions.SectionName));
+
+        services.AddHttpClient<IAiProvider, GeminiProvider>();
+
+        services.AddScoped<IAiConversationService, AiConversationService>();
+        services.AddScoped<IAiAssistantService, AiAssistantService>();
+        services.AddScoped<IKnowledgeService, KnowledgeService>();
+        services.AddScoped<IEmbeddingService, TfIdfEmbeddingService>();
+        services.AddSingleton<AiContextBuilder>();
 
         services.AddHttpContextAccessor();
 

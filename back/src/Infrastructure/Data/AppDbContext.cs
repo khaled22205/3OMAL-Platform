@@ -26,10 +26,15 @@ public class AppDbContext : IdentityDbContext<IdentityUser<int>, IdentityRole<in
     public DbSet<ConversationParticipant> ConversationParticipants => Set<ConversationParticipant>();
     public DbSet<Message> Messages => Set<Message>();
     public DbSet<MessageAttachment> MessageAttachments => Set<MessageAttachment>();
+    public DbSet<AiConversation> AiConversations => Set<AiConversation>();
+    public DbSet<AiMessage> AiMessages => Set<AiMessage>();
+    public DbSet<AiContextReference> AiContextReferences => Set<AiContextReference>();
+    public DbSet<AiUsageLog> AiUsageLogs => Set<AiUsageLog>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
         builder.Entity<IdentityUser<int>>().ToTable("Users");
         builder.Entity<IdentityRole<int>>().ToTable("Roles");

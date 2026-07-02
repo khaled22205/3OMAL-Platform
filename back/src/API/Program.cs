@@ -165,6 +165,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHub<API.Hubs.ChatHub>("/hubs/chat");
+app.MapHub<API.Hubs.AiChatHub>("/hubs/ai");
 
 using (var scope = app.Services.CreateScope())
 {
@@ -172,6 +173,9 @@ using (var scope = app.Services.CreateScope())
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser<int>>>();
     await context.Database.MigrateAsync();
     await DataSeeder.SeedAsync(context, userManager);
+
+    var knowledgeService = scope.ServiceProvider.GetRequiredService<Application.Features.AiAssistant.IKnowledgeService>();
+    await knowledgeService.InitializeAsync();
 }
 
 app.Run();
