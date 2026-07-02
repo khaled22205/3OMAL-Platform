@@ -1,7 +1,7 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    3OMAL-Platform Developer CLI — Automate build, test, database, seed, lint, and dev workflows.
+    3OMAL-Platform Developer CLI - Automate build, test, database, seed, lint, and dev workflows.
 .DESCRIPTION
     Unified command-line tool for managing the 3OMAL full-stack application (ASP.NET Core + Angular).
     Supports interactive and CI mode.
@@ -161,7 +161,7 @@ $($Script:Colors.Bold)Commands:$($Script:Colors.Reset)
   $($Script:Colors.Green)test$($Script:Colors.Reset)          Run tests [back|front|all] (default: all)
   $($Script:Colors.Green)seed$($Script:Colors.Reset)          Seed database with fake data
   $($Script:Colors.Green)clean$($Script:Colors.Reset)         Clean [all|back|front|packages|artifacts]
-  $($Script:Colors.Green)reset$($Script:Colors.Reset)         Drop DB → migrate → seed
+  $($Script:Colors.Green)reset$($Script:Colors.Reset)         Drop DB -> migrate -> seed
   $($Script:Colors.Green)db$($Script:Colors.Reset)            Database management (see below)
   $($Script:Colors.Green)run$($Script:Colors.Reset)           Start dev servers [back|front|all]
   $($Script:Colors.Green)lint$($Script:Colors.Reset)          Lint and format code
@@ -275,7 +275,7 @@ function Invoke-Setup {
     # Create database and migrate
     Write-Info "Step 3: Creating database..."
     & dotnet ef database update --project "$Script:INFRASTRUCTURE_DIR" --startup-project "$Script:API_DIR" 2>&1
-    if ($LASTEXITCODE -ne 0) { Write-Warn "Database creation failed — you may need to configure the connection string" }
+    if ($LASTEXITCODE -ne 0) { Write-Warn "Database creation failed - you may need to configure the connection string" }
 
     # Verify HTTPS cert
     & dotnet dev-certs https --check 2>$null
