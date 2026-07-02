@@ -1,4 +1,6 @@
 using Application.Features.Auth;
+using Application.Features.AiAssistant;
+using Application.Features.AiAssistant.Validators;
 using Application.Features.Bookings;
 using Application.Features.Categories;
 using Application.Features.Reviews;
@@ -322,6 +324,88 @@ public class CreateReviewRequestValidatorTests
     public void Should_fail_when_comment_exceeds_maximum_length()
     {
         var request = new CreateReviewRequest { BookingId = 1, Rating = 5, Comment = new string('x', 2001) };
+        var result = _validator.TestValidate(request);
+        result.IsValid.Should().BeFalse();
+    }
+}
+
+public class StartConversationValidatorTests
+{
+    private readonly StartConversationValidator _validator = new();
+
+    [Fact]
+    public void Should_pass_when_no_firstMessage_or_title()
+    {
+        var request = new StartConversationRequest();
+        var result = _validator.TestValidate(request);
+        result.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Should_pass_with_valid_firstMessage()
+    {
+        var request = new StartConversationRequest { FirstMessage = "Hello, I need a plumber" };
+        var result = _validator.TestValidate(request);
+        result.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Should_fail_when_firstMessage_exceeds_maximum_length()
+    {
+        var request = new StartConversationRequest { FirstMessage = new string('x', 2001) };
+        var result = _validator.TestValidate(request);
+        result.IsValid.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Should_fail_when_title_exceeds_maximum_length()
+    {
+        var request = new StartConversationRequest { Title = new string('x', 201) };
+        var result = _validator.TestValidate(request);
+        result.IsValid.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Should_reject_empty_firstMessage()
+    {
+        var request = new StartConversationRequest { FirstMessage = "" };
+        var result = _validator.TestValidate(request);
+        result.IsValid.Should().BeFalse();
+    }
+}
+
+public class SendAiMessageValidatorTests
+{
+    private readonly SendAiMessageValidator _validator = new();
+
+    [Fact]
+    public void Should_pass_for_valid_request()
+    {
+        var request = new SendAiMessageRequest { ConversationId = 1, Content = "Tell me more" };
+        var result = _validator.TestValidate(request);
+        result.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Should_fail_when_conversationId_is_zero()
+    {
+        var request = new SendAiMessageRequest { ConversationId = 0, Content = "Hello" };
+        var result = _validator.TestValidate(request);
+        result.IsValid.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Should_fail_when_content_is_empty()
+    {
+        var request = new SendAiMessageRequest { ConversationId = 1, Content = "" };
+        var result = _validator.TestValidate(request);
+        result.IsValid.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Should_fail_when_content_exceeds_maximum_length()
+    {
+        var request = new SendAiMessageRequest { ConversationId = 1, Content = new string('x', 2001) };
         var result = _validator.TestValidate(request);
         result.IsValid.Should().BeFalse();
     }

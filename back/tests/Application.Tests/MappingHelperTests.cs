@@ -1,5 +1,6 @@
 using Application.Common.Mappings;
 using Application.Features.Auth;
+using Application.Features.AiAssistant;
 using Application.Features.Categories;
 using Application.Features.Workers;
 using Application.Features.Services;
@@ -368,5 +369,159 @@ public class FavoriteMappingTests
         result.WorkerRating.Should().Be(4.5);
         result.ServiceName.Should().Be("Fix Pipe");
         result.ServicePrice.Should().Be(150);
+    }
+}
+
+public class AiConversationMappingTests
+{
+    [Fact]
+    public void ToSummaryResponse_Should_map_all_properties()
+    {
+        var conv = new AiConversation
+        {
+            Id = 5,
+            UserId = 10,
+            SessionId = null,
+            UserRole = "Admin",
+            Title = "Admin Query",
+            Language = "en",
+            IsArchived = false,
+            IsHidden = false,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = null
+        };
+        var result = conv.ToSummaryResponse();
+
+        result.Id.Should().Be(5);
+        result.UserId.Should().Be(10);
+        result.SessionId.Should().BeNull();
+        result.UserRole.Should().Be("Admin");
+        result.Title.Should().Be("Admin Query");
+        result.Language.Should().Be("en");
+        result.IsArchived.Should().BeFalse();
+        result.LastMessage.Should().BeNull();
+    }
+
+    [Fact]
+    public void ToSummaryResponse_Should_include_last_message()
+    {
+        var conv = new AiConversation { Id = 1, UserId = 1, UserRole = "Customer", Title = "Help" };
+        var lastMsg = new AiMessageResponse { Id = 10, Content = "Last msg", Role = "User" };
+        var result = conv.ToSummaryResponse(lastMsg);
+
+        result.LastMessage.Should().NotBeNull();
+        result.LastMessage!.Id.Should().Be(10);
+        result.LastMessage.Content.Should().Be("Last msg");
+        result.LastMessage.Role.Should().Be("User");
+    }
+
+    [Fact]
+    public void ToSummaryResponse_Should_map_guest_conversation()
+    {
+        var conv = new AiConversation
+        {
+            Id = 2,
+            UserId = null,
+            SessionId = "sess-guest-xyz",
+            UserRole = "Guest",
+            Title = "Guest Help",
+            Language = "ar",
+            IsArchived = true,
+            IsHidden = true
+        };
+        var result = conv.ToSummaryResponse();
+
+        result.UserId.Should().BeNull();
+        result.SessionId.Should().Be("sess-guest-xyz");
+        result.UserRole.Should().Be("Guest");
+        result.IsArchived.Should().BeTrue();
+        result.IsHidden.Should().BeTrue();
+        result.Language.Should().Be("ar");
+    }
+}
+
+public class AiConversationDetailMappingTests
+{
+    [Fact]
+    public void ToDetailResponse_Should_map_all_properties()
+    {
+        var conversation = new AiConversation
+        {
+            Id = 1, UserId = 1, UserRole = "Customer", Title = "Test",
+            Messages = [new AiMessage { Id = 1, ConversationId = 1, Role = AiMessageRole.User, Content = "Hi" }]
+        };
+        var result = conversation.ToDetailResponse();
+
+        result.Id.Should().Be(1);
+        result.UserId.Should().Be(1);
+        result.Messages.Should().ContainSingle();
+        result.Messages[0].Content.Should().Be("Hi");
+        result.Messages[0].Role.Should().Be("User");
+    }
+
+    [Fact]
+    public void ToDetailResponse_Should_map_sources()
+    {
+        var msg = new AiMessage
+        {
+            Id = 1, ConversationId = 1, Role = AiMessageRole.Assistant, Content = "Answer",
+            ContextReferences = [new AiContextReference { SourceType = "worker", SourceId = 42, Title = "Ahmed", RelevanceScore = 0.95 }]
+        };
+        var conversation = new AiConversation { Id = 1, UserId = 1, UserRole = "Customer", Messages = [msg] };
+        var result = conversation.ToDetailResponse();
+
+        var responseMsg = result.Messages.Should().ContainSingle().Subject;
+        responseMsg.Sources.Should().ContainSingle();
+        responseMsg.Sources[0].SourceType.Should().Be("worker");
+        responseMsg.Sources[0].SourceId.Should().Be(42);
+        responseMsg.Sources[0].Title.Should().Be("Ahmed");
+        responseMsg.Sources[0].RelevanceScore.Should().Be(0.95);
+    }
+}
+
+public class AiMessageMappingTests
+{
+    [Fact]
+    public void ToResponse_Should_map_user_message()
+    {
+        var msg = new AiMessage { Id = 1, ConversationId = 5, Role = AiMessageRole.User, Content = "Question?" };
+        var result = msg.ToResponse();
+
+        result.Id.Should().Be(1);
+        result.ConversationId.Should().Be(5);
+        result.Role.Should().Be("User");
+        result.Content.Should().Be("Question?");
+    }
+
+    [Fact]
+    public void ToResponse_Should_map_assistant_message()
+    {
+        var msg = new AiMessage { Id = 2, ConversationId = 5, Role = AiMessageRole.Assistant, Content = "Answer!" };
+        var result = msg.ToResponse();
+
+        result.Role.Should().Be("Assistant");
+    }
+}
+
+public class AiContextReferenceMappingTests
+{
+    [Fact]
+    public void ToResponse_Should_map_all_fields()
+    {
+        var refe = new AiContextReference
+        {
+            SourceType = "category",
+            SourceId = 7,
+            Title = "Plumbing",
+            Excerpt = "All plumbing services",
+            RelevanceScore = 0.88
+        };
+        var result = refe.ToResponse();
+
+        result.SourceType.Should().Be("category");
+        result.SourceId.Should().Be(7);
+        result.Title.Should().Be("Plumbing");
+        result.Excerpt.Should().Be("All plumbing services");
+        result.RelevanceScore.Should().Be(0.88);
     }
 }
