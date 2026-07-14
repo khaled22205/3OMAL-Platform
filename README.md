@@ -162,7 +162,7 @@ Sany3y/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/Mohammed-3tef/Sany3y.git
+   git clone https://github.com/khaled22205/3OMAL-Platform.git
    cd Sany3y
    ```
 
