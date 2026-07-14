@@ -1,0 +1,594 @@
+@{
+    ViewData["Title"] = "الصفحة الرئيسية";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+<style>
+    :root {
+        --primary-green: #6366f1;
+        --accent-yellow: #00d2ff;
+        --light-yellow: #38bdf8;
+        --light-bg: #f8fafc;
+        --text-dark: #0f172a;
+    }
+
+    body {
+        background-color: var(--light-bg);
+        font-family: 'Cairo', sans-serif;
+    }
+
+    .navbar-collapse.collapse {
+        color: var(--text-dark);
+        transition: background-color 0.3s ease;
+    }
+
+    .navbar-collapse.collapse.show {
+        padding: 1rem 0;
+        border-radius: 20px;
+        background-color: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px); /* تأثير البلور */
+        -webkit-backdrop-filter: blur(10px); /* دعم Safari */
+    }
+    
+    .navbar-collapse.collapse.show .navbar-nav {
+        padding: 0rem 1.5rem;
+    }
+
+    .hero-section {
+        background: 
+            radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+            linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+            linear-gradient(135deg, #4f46e5 0%, #7c3aed 30%, #2563eb 70%, #06b6d4 100%);
+        background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px, 100% 100%;
+        min-height: 90vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        width: 150%;
+        height: 100%;
+        top: -50%;
+        left: -25%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, transparent 60%);
+        transform: rotate(-12deg);
+        z-index: 1;
+    }
+
+    .hero-content {
+        z-index: 2;
+        max-width: 900px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .hero-title {
+        font-size: 4rem;
+        font-weight: 900;
+        margin-bottom: 1.5rem;
+        text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        letter-spacing: -1px;
+    }
+
+    .hero-subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 3rem;
+        opacity: 0.95;
+        font-weight: 500;
+        text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+
+    /* Glassmorphism Search Box */
+    .search-box {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 10px;
+        border-radius: 50px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        display: flex;
+        gap: 10px;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .search-input {
+        border: none;
+        background: transparent;
+        padding: 15px 25px;
+        font-size: 1.1rem;
+        width: 100%;
+        color: white;
+    }
+    
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .search-input:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .search-btn {
+        border-radius: 50px;
+        padding: 12px 40px;
+        font-weight: bold;
+        font-size: 1.1rem;
+        transition: all 0.3s;
+        background: #ffb300;
+        color: #0f172a;
+        border: none;
+        white-space: nowrap;
+    }
+
+    .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 179, 0, 0.4);
+        background: #ffc107;
+        color: #0f172a;
+    }
+
+    /* Section Headers */
+    .section-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .section-title {
+        color: var(--primary-green);
+        font-weight: 800;
+        position: relative;
+        display: inline-block;
+        padding-bottom: 10px;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 50px;
+        height: 3px;
+        background-color: var(--accent-yellow);
+        border-radius: 2px;
+    }
+
+    /* Categories / Filter */
+    .filter-btn {
+        border-radius: 30px;
+        padding: 8px 22px;
+        margin: 0 5px;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        color: #475569;
+        font-weight: 600;
+        transition: all 0.25s ease-in-out;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(4px);
+    }
+
+    .filter-btn:hover {
+        background: #f1f5f9;
+        color: var(--primary-green);
+        transform: translateY(-1px);
+        border-color: rgba(99, 102, 241, 0.4);
+    }
+
+    .filter-btn.active {
+        background: var(--primary-green) !important;
+        border-color: var(--primary-green) !important;
+        color: white !important;
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
+        transform: translateY(-2px);
+    }
+
+    /* Technician Cards */
+    .tech-card {
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-radius: 24px;
+        overflow: hidden;
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        background: white;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    }
+
+    .tech-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(99, 102, 241, 0.1);
+        border-color: rgba(99, 102, 241, 0.2);
+    }
+
+    .tech-img-wrapper {
+        height: 200px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .tech-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s;
+    }
+
+    .tech-card:hover .tech-img {
+        transform: scale(1.1);
+    }
+
+    .tech-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+        padding: 20px;
+        color: white;
+    }
+
+    /* Steps Section */
+    .step-card {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        transition: all 0.3s;
+        height: 100%;
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+    }
+
+    .step-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 0;
+        background: var(--primary-green);
+        z-index: -1;
+        transition: all 0.4s ease;
+        border-radius: 20px;
+    }
+
+    .step-card:hover::before {
+        height: 100%;
+    }
+
+    .step-card:hover h5, .step-card:hover p {
+        color: white !important;
+    }
+
+    .step-icon-box {
+        width: 80px;
+        height: 80px;
+        background: var(--light-bg);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        transition: all 0.3s;
+    }
+
+    .step-card:hover .step-icon-box {
+        background: white;
+        transform: rotateY(180deg);
+    }
+
+    /* Testimonials */
+    .testimonial-card {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        position: relative;
+        margin: 20px;
+    }
+
+    .quote-icon {
+        color: var(--accent-yellow);
+        font-size: 2rem;
+        opacity: 0.3;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="hero-section text-white text-center animate__animated animate__fadeIn">
+    <div class="hero-content">
+        <h1 class="hero-title animate__animated animate__fadeInDown">دور على صنايعي في ثواني</h1>
+        <p class="hero-subtitle animate__animated animate__fadeInUp">كل الخدمات في مكان واحد — سباكة، نجارة، كهرباء وغيرهم</p>
+        
+        <form class="search-form mt-5 animate__animated animate__fadeInUp animate__delay-1s" method="get" action="@Url.Action("Search", "Services")">
+            <div class="search-box">
+                <i class="fas fa-search text-white align-self-center ms-3 opacity-75"></i>
+                <input type="text" name="serviceType" class="search-input" placeholder="ابحث عن خدمة (مثال: سباكة، كهرباء...)">
+                <button type="submit" class="search-btn">ابحث الآن</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Categories & Technicians -->
+<section class="py-5">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">تصفح حسب التخصص</h2>
+        </div>
+
+        <!-- Filters -->
+        @model Sany3y.Infrastructure.ViewModels.HomeIndexViewModel
+
+        <div class="d-flex justify-content-center flex-wrap mb-5 gap-2">
+            <button class="filter-btn active" id="all-technicians" data-id="0">الكل</button>
+            @foreach (var category in Model.Categories)
+            {
+                <button class="filter-btn" data-id="@category.Id">@category.Name</button>
+            }
+        </div>
+
+        <div class="row g-4" id="technicians-grid">
+            <!-- هنا هيتم وضع الـ Technicians عن طريق AJAX -->
+        </div>
+
+
+        <!-- Technicians Grid -->
+       
+        
+        <div class="text-center mt-5">
+            <a href="@Url.Action("Index", "Services")" class="btn btn-primary rounded-pill px-5 py-2"> عرض جميع الفنيين  </a>
+        </div>
+
+    </div>
+</section>
+
+<!-- How it Works -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">كيف تطلب صنايعي؟</h2>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-icon-box">
+                        <i class="fas fa-search fa-2x text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3" style="color: var(--primary-green);">1. ابحث عن الخدمة</h5>
+                    <p class="text-muted">اختر نوع الخدمة التي تحتاجها من بين مجموعة واسعة من التخصصات.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-icon-box">
+                        <i class="fas fa-user-check fa-2x text-warning"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3" style="color: var(--primary-green);">2. اختر الصنايعي</h5>
+                    <p class="text-muted">قارن بين الفنيين بناءً على التقييمات والأسعار واختر الأنسب لك.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-icon-box">
+                        <i class="fas fa-calendar-check fa-2x text-success"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3" style="color: var(--primary-green);">3. احجز الموعد</h5>
+                    <p class="text-muted">تواصل مع الفني وحدد الموعد المناسب لإتمام المهمة.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="py-5">
+    <div class="container">
+        <div class="section-header text-center mb-4">
+            <h2 class="section-title">آراء عملائنا</h2>
+        </div>
+
+        <div class="swiper mySwiper pb-5">
+            <div class="swiper-wrapper">
+                <!-- Slide 1 -->
+                <div class="swiper-slide">
+                    <div class="testimonial-card text-center p-4 border rounded shadow-sm">
+                        <i class="fas fa-quote-right quote-icon mb-2"></i>
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" class="rounded-circle mb-3" width="80" height="80" alt="Client">
+                        <h5 class="fw-bold mb-1">أحمد محمود</h5>
+                        <p class="text-muted small mb-3">عميل مميز</p>
+                        <p class="fst-italic text-muted">"تجربة ممتازة جداً، الفني وصل في الموعد وأنجز العمل باحترافية وسرعة. أنصح بشدة بالتعامل مع المنصة."</p>
+                        <div class="text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2 -->
+                <div class="swiper-slide">
+                    <div class="testimonial-card text-center p-4 border rounded shadow-sm">
+                        <i class="fas fa-quote-right quote-icon mb-2"></i>
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" class="rounded-circle mb-3" width="80" height="80" alt="Client">
+                        <h5 class="fw-bold mb-1">سارة عبد الرحمن</h5>
+                        <p class="text-muted small mb-3">عميل نشط</p>
+                        <p class="fst-italic text-muted">"الخدمة ممتازة والتطبيق سهل الاستخدام جداً. السباك كان ممتازاً، النقطة الوحيدة أنه تأخر ربع ساعة لكن العمل كان رائعاً."</p>
+                        <div class="text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="swiper-slide">
+                    <div class="testimonial-card text-center p-4 border rounded shadow-sm">
+                        <i class="fas fa-quote-right quote-icon mb-2"></i>
+                        <img src="https://randomuser.me/api/portraits/men/46.jpg" class="rounded-circle mb-3" width="80" height="80" alt="Client">
+                        <h5 class="fw-bold mb-1">خالد مصطفى</h5>
+                        <p class="text-muted small mb-3">عميل مميز</p>
+                        <p class="fst-italic text-muted">"قمت بطلب خدمة تركيب تكييف وصيانة الكهرباء، الأسعار كانت واضحة جداً والفنيين على أعلى مستوى من الاحترام والخبرة."</p>
+                        <div class="text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 4 -->
+                <div class="swiper-slide">
+                    <div class="testimonial-card text-center p-4 border rounded shadow-sm">
+                        <i class="fas fa-quote-right quote-icon mb-2"></i>
+                        <img src="https://randomuser.me/api/portraits/women/12.jpg" class="rounded-circle mb-3" width="80" height="80" alt="Client">
+                        <h5 class="fw-bold mb-1">منى المهدي</h5>
+                        <p class="text-muted small mb-3">عميل جديد</p>
+                        <p class="fst-italic text-muted">"فكرة رائعة ومريحة للغاية، وفرت عليّ الكثير من البحث عن نجار موثوق. حجزت الموعد وخلال ساعة تم إنجاز العمل بالكامل."</p>
+                        <div class="text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 5 -->
+                <div class="swiper-slide">
+                    <div class="testimonial-card text-center p-4 border rounded shadow-sm">
+                        <i class="fas fa-quote-right quote-icon mb-2"></i>
+                        <img src="https://randomuser.me/api/portraits/men/22.jpg" class="rounded-circle mb-3" width="80" height="80" alt="Client">
+                        <h5 class="fw-bold mb-1">يوسف حسن</h5>
+                        <p class="text-muted small mb-3">عميل نشط</p>
+                        <p class="fst-italic text-muted">"منصة ممتازة جداً. تعاملت مع فني دهانات وكان شغله نظيفاً وسريعاً والتكلفة مناسبة جداً مقارنة بأسعار السوق."</p>
+                        <div class="text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+</section>
+               
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var swiper = new Swiper(".mySwiper", {
+                slidesPerView: 1,
+                spaceBetween: 30,
+                loop: true,
+                autoplay: {
+                    delay: 3000,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: ".swiper-pagination",
+                    clickable: true,
+                },
+                breakpoints: {
+                    576: { slidesPerView: 1 },
+                    768: { slidesPerView: 2 },
+                    992: { slidesPerView: 3 },
+                    1200: { slidesPerView: 4 },
+                }
+            });
+
+            $(".filter-btn").click(function () {
+
+                $(".filter-btn").removeClass("active");
+                $(this).addClass("active");
+
+                let categoryId = $(this).data("id");
+
+                $.ajax({
+                    url: "/api/Technician/GetByCategory/" + categoryId,
+                    method: "GET",
+                    success: async function (technicians) {
+                        let grid = $("#technicians-grid");
+                        grid.empty();
+
+                        // جلب الصور لكل فني
+                        for (const t of technicians.slice(0, 8)) {
+                            let profileUrl = 'https://placehold.co/300x200?text=Technician';
+
+                            if (t.profilePictureId) {
+                                try {
+                                    let picResponse = await fetch("/api/ProfilePicture/GetById/" + t.profilePictureId);
+                                    if (picResponse.ok) {
+                                        let picData = await picResponse.json();
+                                        if (picData.path) profileUrl = picData.path;
+                                    }
+                                } catch (err) {
+                                    console.error("Error fetching profile picture:", err);
+                                }
+                            }
+
+                            if (t.isShop) continue;
+
+                            let card = `
+                                <div class="col-lg-3 col-md-4 col-sm-6">
+                                    <div class="tech-card h-100 d-flex flex-column">
+                                        <div class="tech-img-wrapper">
+                                            <img src="${profileUrl}" class="tech-img" />
+                                        </div>
+                                        <div class="card-body p-3 text-center d-flex flex-column justify-content-between flex-grow-1">
+                                            <div>
+                                                <h5 class="fw-bold mb-2" style="font-family: 'Cairo', sans-serif; color: var(--text-dark); font-size: 1.15rem;">${t.firstName} ${t.lastName}</h5>
+                                                <div class="mb-3 d-flex flex-column align-items-center gap-1">
+                                                    <span style="font-size: 0.82rem; color: #6366f1; background: rgba(99, 102, 241, 0.08); padding: 3px 12px; border-radius: 20px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                                                        <i class="fas fa-tools text-primary" style="font-size: 0.75rem;"></i> ${t.category ? (t.category.name || t.category.Name) : (t.categoryName || 'فني')}
+                                                    </span>
+                                                    <span class="text-muted" style="font-size: 0.8rem; display: inline-flex; align-items: center; gap: 4px;">
+                                                        <i class="fas fa-map-marker-alt text-danger" style="font-size: 0.75rem;"></i> ${t.address ? (t.address.city || t.address.City) : (t.city || 'غير محدد')}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <a href="/Services/Details/${t.id}" class="btn btn-outline-primary btn-sm w-100 rounded-pill" style="border-color: var(--primary-green); color: var(--primary-green); font-weight: 600; transition: all 0.25s;">
+                                                عرض الملف الشخصي
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>`;
+
+                            grid.append(card);
+                        }
+                    }
+                });
+            });
+
+            // تحميل الكل أول ما الصفحة تفتح
+            $(".filter-btn[data-id='0']").click();
+        });
+    </script>
+}

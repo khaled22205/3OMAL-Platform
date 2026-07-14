@@ -1,0 +1,451 @@
+@model Sany3y.Infrastructure.ViewModels.LoginUserViewModel
+
+@{
+    ViewData["Title"] = "تسجيل الدخول | صنايعي";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+    :root {
+        --modern-green-dark: #3730a3;
+        --modern-green-primary: #4f46e5;
+        --modern-green-light: #6366f1;
+        --accent-orange: #0ea5e9; /* Sky Blue */
+        --glass-bg: rgba(255, 255, 255, 0.85);
+        --glass-border: rgba(255, 255, 255, 0.5);
+    }
+
+    body {
+        background-color: #f8fafc;
+        background-image: radial-gradient(circle at 5% 15%, rgba(99, 102, 241, 0.05) 0%, transparent 35%),
+                          radial-gradient(circle at 95% 85%, rgba(6, 182, 212, 0.05) 0%, transparent 35%);
+    }
+
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    /* كارت زجاجي عصري يجمع الشاشتين */
+    .login-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(14, 165, 233, 0.2);
+        border-radius: 24px;
+        box-shadow: 0 30px 60px -15px rgba(99, 102, 241, 0.15), 
+                    0 20px 45px -20px rgba(14, 165, 233, 0.35), 
+                    0 0 0 1px rgba(14, 165, 233, 0.05);
+        overflow: hidden;
+        max-width: 1100px;
+        width: 100%;
+        min-height: 650px;
+    }
+
+    /* الجانب الجمالي الإبداعي */
+    .login-image-side {
+        background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1000&q=80');
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 50px;
+        color: white;
+    }
+
+    .login-image-side::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(99, 102, 241, 0.2) 0%, rgba(55, 48, 163, 0.85) 100%);
+    }
+
+    .welcome-text {
+        position: relative;
+        z-index: 2;
+    }
+
+    .welcome-text h1 {
+        font-family: 'Cairo', sans-serif;
+        font-weight: 900;
+        font-size: 2.5rem;
+        letter-spacing: -1px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .welcome-text .feature-tag {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(5px);
+        padding: 6px 16px;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        display: inline-block;
+        margin-bottom: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    /* جانب الفروم وأدوات الإدخال */
+    .login-content-side {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 50px 40px;
+        background: white;
+    }
+
+    .login-form-wrapper {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .brand-logo-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.8rem;
+        font-weight: 800;
+        text-decoration: none;
+        margin-bottom: 5px;
+    }
+
+    /* حقول الإدخال المحسنة هندسياً */
+    .form-group-custom {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .form-group-custom i {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        color: #888;
+        z-index: 10;
+        transition: color 0.3s;
+    }
+
+    .form-control-custom {
+        width: 100%;
+        padding: 14px 45px 14px 15px; /* مسافة للأيقونة على اليمين */
+        border-radius: 14px;
+        border: 1.5px solid #e2e8f0;
+        background-color: #f8fafc;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        outline: none;
+    }
+
+    .form-control-custom:focus {
+        background-color: white;
+        border-color: var(--modern-green-light);
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    .form-control-custom:focus + i {
+        color: var(--modern-green-light);
+    }
+
+    .form-group-custom label {
+        position: absolute;
+        top: -10px;
+        right: 15px;
+        background: white;
+        padding: 0 6px;
+        font-size: 0.8rem;
+        color: #718096;
+        font-weight: 600;
+        border-radius: 4px;
+    }
+
+    /* الأزرار التفاعلية الراقية */
+    .btn-login {
+        background: linear-gradient(135deg, var(--modern-green-primary) 0%, var(--modern-green-light) 100%);
+        color: white;
+        border: none;
+        padding: 14px;
+        font-weight: 600;
+        border-radius: 14px;
+        font-size: 1.05rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15);
+    }
+
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.25);
+        opacity: 0.95;
+    }
+
+    .btn-google {
+        background: white;
+        border: 1.5px solid #e2e8f0;
+        color: #4a5568;
+        font-weight: 600;
+        padding: 12px;
+        border-radius: 14px;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-google:hover {
+        background: #f7fafc;
+        border-color: #cbd5e0;
+        transform: translateY(-1px);
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 25px 0;
+        color: #a0aec0;
+    }
+
+    .divider::before, .divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1.5px dashed #e2e8f0;
+    }
+
+    .divider span {
+        padding: 0 15px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .custom-checkbox .form-check-input:checked {
+        background-color: var(--modern-green-light);
+        border-color: var(--modern-green-light);
+    }
+
+    /* Custom overrides for yellow to sky blue & green to indigo */
+    .text-success {
+        color: var(--modern-green-primary) !important;
+    }
+    .text-warning {
+        color: var(--accent-orange) !important;
+    }
+</style>
+
+<div class="login-container">
+    <div class="login-card row g-0">
+        <div class="col-lg-6 d-none d-lg-flex login-image-side animate__animated animate__fadeIn">
+            <div class="welcome-text">
+                <span class="feature-tag"><i class="fa-solid fa-sparkles me-1 text-warning"></i> لمسة من الإتقان</span>
+                <h1 class="mb-3">عمَّال في جيبك!</h1>
+                <p class="lead opacity-75 mb-0">سرعة، جودة، وموثوقية في مكان واحد لحل جميع احتياجات منزلك.</p>
+            </div>
+        </div>
+
+        <div class="col-lg-6 login-content-side animate__animated animate__fadeInLeft">
+            <div class="login-form-wrapper">
+                
+                <div class="mb-4">
+                    <a href="/" class="brand-logo-container">
+                        <span class="fw-bold" style="font-size: 2.2rem; font-weight: 900 !important; background: linear-gradient(135deg, #6366f1 0%, #ec4899 60%, #fbbf24 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">عمَّال</span>
+                    </a>
+                    <h4 class="fw-bold text-dark mb-1">أهلاً بك مجدداً</h4>
+                    <p class="text-muted small">قم بتسجيل الدخول للمتابعة في حسابك</p>
+                </div>
+
+                <form asp-controller="Account" asp-action="Login">
+                    
+                    <div asp-validation-summary="All" class="alert alert-danger mb-4 py-2 px-3 rounded-3" role="alert" style="display:none; font-size: 0.9rem;"></div>
+
+                    <div class="form-group-custom">
+                        <label asp-for="UserName">اسم المستخدم</label>
+                        <input asp-for="UserName" class="form-control-custom" placeholder="ادخل اسم المستخدم أو بريدك الإلكتروني" autocomplete="off" />
+                        <i class="fa-regular fa-user"></i>
+                        <span asp-validation-for="UserName" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="form-group-custom">
+                        <label asp-for="Password">كلمة المرور</label>
+                        <input asp-for="Password" type="password" class="form-control-custom" placeholder="••••••••" />
+                        <i class="fa-regular fa-lock"></i>
+                        <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-4 custom-checkbox">
+                        <div class="form-check">
+                            <input class="form-check-input" asp-for="RememberMe" id="rememberMe" />
+                            <label class="form-check-label text-muted small" for="rememberMe">تذكرني على هذا الجهاز</label>
+                        </div>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal" class="text-success text-decoration-none small fw-bold">نسيت كلمة المرور؟</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-login w-100 mb-3">
+                        <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> دخول آمن
+                    </button>
+                </form>
+
+                <div class="divider">
+                    <span>أو الدخول الاجتماعي</span>
+                </div>
+
+                <form asp-controller="Account" asp-action="ExternalLogin" method="post" class="mb-4">
+                    <button type="submit" name="provider" value="Google" class="btn btn-google w-100">
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="18">
+                        دخول بواسطة جوجل
+                    </button>
+                </form>
+
+                <div class="text-center pt-2">
+                    <p class="text-muted small mb-0">
+                        جديد على منصة صنايعي؟
+                        <a asp-controller="Account" asp-action="Register" class="text-success fw-bold text-decoration-none ms-1">أنشئ حساباً جديداً</a>
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true" dir="rtl">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-0 pb-0" style="padding: 25px 25px 10px;">
+                <h5 class="modal-title fw-bold text-dark" id="forgotPasswordModalLabel" style="font-family: 'Cairo', sans-serif;">إعادة تعيين كلمة المرور</h5>
+                <button type="button" class="btn-close ms-0 me-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 10px 25px 25px;">
+                <!-- step 1: Email input -->
+                <div id="otpStepPhone">
+                    <p class="text-muted small mb-4">أدخل البريد الإلكتروني المسجل بحسابك لإرسال رمز التحقق OTP إليه.</p>
+                    <div class="form-group mb-3">
+                        <label class="form-label small fw-bold text-secondary">البريد الإلكتروني</label>
+                        <input type="email" id="otpEmailInput" class="form-control rounded-3 py-2" placeholder="example@domain.com" style="font-size: 0.95rem;" />
+                    </div>
+                    <div id="otpPhoneError" class="text-danger small mb-3 d-none"></div>
+                    <button type="button" id="btnSendOtp" class="btn btn-primary w-100 rounded-pill py-2 fw-bold" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); border: none;">إرسال كود التحقق</button>
+                </div>
+
+                <!-- step 2: OTP & New Password -->
+                <div id="otpStepReset" class="d-none">
+                    <p class="text-success small mb-3 fw-bold"><i class="fas fa-check-circle me-1"></i> تم إرسال كود التحقق (OTP) بنجاح إلى بريدك الإلكتروني.</p>
+                    
+                    <div class="form-group mb-3">
+                        <label class="form-label small fw-bold text-secondary">كود التحقق (OTP)</label>
+                        <input type="text" id="otpCodeInput" class="form-control text-center rounded-3 py-2 fw-bold" placeholder="------" maxlength="6" style="font-size: 1.1rem;" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label small fw-bold text-secondary">كلمة المرور الجديدة</label>
+                        <input type="password" id="otpNewPasswordInput" class="form-control rounded-3 py-2" placeholder="••••••••" style="font-size: 0.95rem;" />
+                    </div>
+
+                    <div id="otpResetError" class="text-danger small mb-3 d-none"></div>
+                    <button type="button" id="btnVerifyAndReset" class="btn btn-success w-100 rounded-pill py-2 fw-bold" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none;">إعادة تعيين كلمة المرور</button>
+                </div>
+
+                <!-- step 3: Success -->
+                <div id="otpStepSuccess" class="d-none text-center py-4">
+                    <i class="fas fa-check-circle text-success fa-4x mb-3 animate__animated animate__bounceIn"></i>
+                    <h5 class="fw-bold mb-2 text-dark" style="font-family: 'Cairo', sans-serif;">تم بنجاح!</h5>
+                    <p class="text-muted small mb-4">تمت إعادة تعيين كلمة المرور الخاصة بك بنجاح. يمكنك الآن تسجيل الدخول باستخدام كلمة المرور الجديدة.</p>
+                    <button type="button" class="btn btn-secondary rounded-pill px-5 py-2 fw-bold" data-bs-dismiss="modal">موافق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            // كود تفاعلي لإظهار الـ Alert الخاص بالأخطاء لو فيه مشكلة في الإدخال
+            if ($(".validation-summary-errors").length > 0) {
+                $(".alert-danger").fadeIn();
+            }
+
+            // Forgot Password OTP flow
+            $("#btnSendOtp").click(function() {
+                var emailVal = $("#otpEmailInput").val().trim();
+                if (!emailVal) {
+                    $("#otpPhoneError").text("يرجى إدخال البريد الإلكتروني.").removeClass("d-none");
+                    return;
+                }
+
+                $("#otpPhoneError").addClass("d-none");
+                $("#btnSendOtp").prop("disabled", true).text("جاري الإرسال...");
+
+                $.ajax({
+                    url: '/Account/SendResetOtp',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ email: emailVal }),
+                    success: function(response) {
+                        $("#otpStepPhone").addClass("d-none");
+                        $("#otpStepReset").removeClass("d-none");
+                    },
+                    error: function(xhr) {
+                        var errMsg = xhr.responseText || "حدث خطأ أثناء إرسال الكود.";
+                        $("#otpPhoneError").text(errMsg).removeClass("d-none");
+                        $("#btnSendOtp").prop("disabled", false).text("إرسال كود التحقق");
+                    }
+                });
+            });
+
+            $("#btnVerifyAndReset").click(function() {
+                var emailVal = $("#otpEmailInput").val().trim();
+                var otp = $("#otpCodeInput").val().trim();
+                var newPassword = $("#otpNewPasswordInput").val().trim();
+
+                if (!otp || !newPassword) {
+                    $("#otpResetError").text("يرجى ملء جميع الحقول.").removeClass("d-none");
+                    return;
+                }
+
+                $("#otpResetError").addClass("d-none");
+                $("#btnVerifyAndReset").prop("disabled", true).text("جاري الحفظ...");
+
+                $.ajax({
+                    url: '/Account/VerifyOtpAndResetPassword',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        email: emailVal,
+                        otp: otp,
+                        newPassword: newPassword
+                    }),
+                    success: function(response) {
+                        $("#otpStepReset").addClass("d-none");
+                        $("#otpStepSuccess").removeClass("d-none");
+                    },
+                    error: function(xhr) {
+                        var errMsg = xhr.responseText || "حدث خطأ أثناء التحقق وإعادة التعيين.";
+                        $("#otpResetError").text(errMsg).removeClass("d-none");
+                        $("#btnVerifyAndReset").prop("disabled", false).text("إعادة تعيين كلمة المرور");
+                    }
+                });
+            });
+
+            // Reset modal states when closed
+            $('#forgotPasswordModal').on('hidden.bs.modal', function () {
+                $("#otpStepPhone").removeClass("d-none");
+                $("#otpStepReset").addClass("d-none");
+                $("#otpStepSuccess").addClass("d-none");
+                $("#otpEmailInput").val("");
+                $("#otpCodeInput").val("");
+                $("#otpNewPasswordInput").val("");
+                $("#otpPhoneError").addClass("d-none");
+                $("#otpResetError").addClass("d-none");
+                $("#btnSendOtp").prop("disabled", false).text("إرسال كود التحقق");
+                $("#btnVerifyAndReset").prop("disabled", false).text("إعادة تعيين كلمة المرور");
+            });
+        });
+    </script>
+}

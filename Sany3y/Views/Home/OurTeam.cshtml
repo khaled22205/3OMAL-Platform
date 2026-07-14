@@ -1,0 +1,62 @@
+@{
+    ViewData["Title"] = "فريق العمل";
+}
+
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="text-center mb-5 pb-3">
+        <h1 class="display-4 fw-extrabold mb-3" style="font-family: 'Cairo', sans-serif; font-weight: 900; background: linear-gradient(135deg, #3730a3 0%, #6366f1 50%, #06b6d4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">@ViewData["Title"]</h1>
+        <p class="text-secondary mx-auto" style="font-family: 'Cairo', sans-serif; font-size: 1.15rem; max-width: 600px; line-height: 1.6;">
+            تعرّف على العقول والمواهب المبدعة التي تقود منصة عمَّال لتغيير قطاع الخدمات المهنية والحرفية.
+        </p>
+    </div>
+
+    <!-- Grid Layout -->
+    <div class="row gy-4 justify-content-center">
+        @await Html.PartialAsync("_TeamMemberCard", new {
+            Image = "~/img/team_members/atef.jpeg",
+            Name = "Mohamed Atef",
+            Role = "Full Stack .Net Back-End Developer",
+            Description = "Mohammed is the creative force behind 3ommal, managing every detail with passion and precision. His vision and leadership shape the team’s direction, ensuring every project reflects innovation and authenticity. Known for his calm energy and perfectionist touch, he’s the heartbeat of the team.",
+            Email = "dsakl",
+            Linkedin = "https://www.linkedin.com/in/mohamed-atef-972120266/"
+        })
+
+        @await Html.PartialAsync("_TeamMemberCard", new {
+            Image = "~/img/team_members/Nabil.jpeg",
+            Name = "Mohamed Nabil",
+            Role = "Full Stack .Net Back-End Developer",
+            Description = "Mohamed bridges the gap between elegant design and robust engineering. He crafts seamless, full-stack digital experiences that are as intuitive as they are powerful, ensuring every user enjoys a smooth journey from the interface to the database. His philosophy combines clean, scalable code with a deep empathy for the user.",
+            Email = "mnbil0680@gmail.com",
+            Linkedin = "https://www.linkedin.com/in/mnbil0680/"
+        })
+
+        @await Html.PartialAsync("_TeamMemberCard", new {
+            Image = "~/img/team_members/khaled.jpeg",
+            Name = "Khaled Hamada",
+            Role = "Full Stack .Net Back-End Developer",
+            Description = "Khaled turns imagination into code. With a deep understanding of structure and interaction, he makes the impossible look easy. His clean, efficient code ensures the website runs smoothly and beautifully on every screen.",
+            Email = "khaled.hamada245@gmail.com",
+            Linkedin = "https://www.linkedin.com/in/khaled-hamada-hassan/"
+        })
+
+        @await Html.PartialAsync("_TeamMemberCard", new {
+            Image = "~/img/team_members/soliman.jpeg",
+            Name = "Mahmoud Soliman",
+            Role = "Full Stack .Net Back-End Developer",
+            Description = "Mahmoud is the logic master of Sany3y. He builds the strong technical foundation that powers every feature. With his problem-solving mindset, he ensures stability, security, and performance behind the scenes.",
+            Email = "mahmoud.soliman02@gmail.com",
+            Linkedin = "https://www.linkedin.com/in/mahmoud-soliman-b0b838393/"
+        })
+
+        <!-- 5th Member Box (New Member Placeholder) -->
+        @await Html.PartialAsync("_TeamMemberCard", new {
+            Image = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+            Name = "عضو جديد (قريباً)",
+            Role = "مطور برمجيات / مصمم",
+            Description = "هذه مساحة مخصصة للعضو الجديد في فريق عمَّال. يمكنك تعديل الاسم، الصورة، النبذة التعريفية وروابط التواصل الاجتماعي بكل سهولة لتناسب العضو الجديد.",
+            Email = "info@ommal.com",
+            Linkedin = "https://www.linkedin.com"
+        })
+    </div>
+</div>

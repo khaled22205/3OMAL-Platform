@@ -1,0 +1,121 @@
+@model dynamic
+<div class="col-lg-4 col-md-6 d-flex text-start team-card-wrapper">
+    <div class="card team-member-card flex-fill d-flex flex-column border-0">
+        <div class="card-body d-flex flex-column p-4" dir="ltr">
+            <!-- Image Wrapper with Zoom Effect -->
+            <div class="member-img-wrapper mb-4">
+                <img src="@Url.Content(Model.Image)" alt="@Model.Name" class="member-img" />
+            </div>
+
+            <!-- Member details -->
+            <h3 class="member-name mb-1">@Model.Name</h3>
+            <h6 class="member-role mb-3 text-uppercase tracking-wider">@Model.Role</h6>
+            <p class="member-desc flex-grow-1 mb-4">@Model.Description</p>
+            
+            <!-- Social links -->
+            <div class="member-socials d-flex gap-3">
+                <a href="mailto:@Model.Email" class="social-icon-btn email-btn" target="_blank" title="Email">
+                    <i class="fa-solid fa-envelope"></i>
+                </a>
+                <a href="@Model.Linkedin" class="social-icon-btn linkedin-btn" target="_blank" title="LinkedIn">
+                    <i class="fa-brands fa-linkedin-in"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .team-card-wrapper {
+        margin-bottom: 2rem;
+    }
+    
+    .team-member-card {
+        background: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(99, 102, 241, 0.08) !important;
+        border-radius: 24px !important;
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.03) !important;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        overflow: hidden;
+    }
+    
+    .team-member-card:hover {
+        transform: translateY(-8px) !important;
+        box-shadow: 0 30px 60px rgba(99, 102, 241, 0.12) !important;
+        border-color: rgba(99, 102, 241, 0.25) !important;
+    }
+    
+    .member-img-wrapper {
+        position: relative;
+        width: 100%;
+        height: 280px;
+        overflow: hidden;
+        border-radius: 18px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+    }
+    
+    .member-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .team-member-card:hover .member-img {
+        transform: scale(1.08);
+    }
+    
+    .member-name {
+        font-family: 'Cairo', sans-serif;
+        font-weight: 800;
+        font-size: 1.45rem;
+        background: linear-gradient(135deg, #3730a3 0%, #4f46e5 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .member-role {
+        font-family: 'Cairo', sans-serif;
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        color: #6366f1;
+        opacity: 0.9;
+    }
+    
+    .member-desc {
+        font-family: 'Cairo', sans-serif;
+        font-size: 0.92rem;
+        color: #475569;
+        line-height: 1.7;
+    }
+    
+    .social-icon-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: #f1f5f9;
+        color: #64748b;
+        font-size: 1.1rem;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .email-btn:hover {
+        background: #fef2f2;
+        color: #ef4444;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(239, 68, 68, 0.15);
+    }
+    
+    .linkedin-btn:hover {
+        background: #f0f9ff;
+        color: #0077b5;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0, 119, 181, 0.15);
+    }
+</style>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - لوحة تحكم صنايعي</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
+
+    <!-- DataTables Bootstrap5 CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+    <!-- DataTables Responsive CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css" />
+
+    <!-- DataTables Buttons CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="~/Sany3y.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="icon" type="image/x-icon" href="~/favicon.png" />
+    <style>
+        :root {
+            --admin-sidebar-width: 280px;
+            --admin-header-height: 70px;
+            --primary-green: #0ea5e9; /* Sky Blue primary accent */
+            --dark-sidebar: #0f172a; /* Deep Slate */
+            --light-bg: #f8fafc;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif !important;
+            background-color: var(--light-bg);
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        .admin-sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: var(--admin-sidebar-width);
+            background: linear-gradient(185deg, #0f172a 0%, #0369a1 100%);
+            color: white;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: -10px 0 30px rgba(15, 23, 42, 0.15);
+        }
+
+        .sidebar-header {
+            height: var(--admin-header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar-brand {
+            color: white;
+            font-size: 1.6rem;
+            font-weight: 900;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-brand:hover {
+            color: #38bdf8;
+        }
+
+        .sidebar-content {
+            padding: 20px 0;
+            overflow-y: auto;
+            height: calc(100vh - var(--admin-header-height));
+        }
+
+        /* Main Content Styles */
+        .admin-main {
+            margin-right: var(--admin-sidebar-width);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            height: var(--admin-header-height);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .admin-content {
+            padding: 30px;
+        }
+
+        /* Responsive */
+        @@media (max-width: 992px) {
+            .admin-sidebar {
+                transform: translateX(100%);
+            }
+            
+            .admin-sidebar.active {
+                transform: translateX(0);
+            }
+
+            .admin-main {
+                margin-right: 0;
+            }
+        }
+
+        /* Interactive Navigation Links */
+        .nav-link {
+            color: rgba(255, 255, 255, 0.75) !important;
+            padding: 12px 24px !important;
+            margin: 4px 15px !important;
+            border-radius: 12px !important;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            border-right: none !important;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+            background: rgba(255, 255, 255, 0.08) !important;
+            transform: translateX(-6px);
+        }
+
+        .nav-link.active {
+            color: white !important;
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.25) !important;
+            font-weight: 700;
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.15rem;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover i {
+            transform: scale(1.15);
+        }
+    </style>
+</head>
+<body>
+    @{
+        <partial name="_Notification" />
+    }
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-brand text-decoration-none">
+                <span class="fw-bold text-white" style="font-size: 1.95rem; font-weight: 900 !important; font-family: 'Cairo', sans-serif;">عمَّال <span style="font-size: 0.95rem; font-weight: 600; color: #38bdf8; background: rgba(56, 189, 248, 0.15); padding: 4px 10px; border-radius: 8px; margin-right: 5px;">مدير</span></span>
+            </a>
+            <button class="btn text-white d-lg-none ms-auto" id="sidebarClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-content">
+            <partial name="~/Views/Admin/_AdminSidebar.cshtml" />
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <header class="admin-header">
+            <button class="btn btn-link text-dark d-lg-none" id="sidebarToggle">
+                <i class="fas fa-bars fa-lg"></i>
+            </button>
+            
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span class="fw-bold d-none d-md-block">Admin</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
+                        <li><a class="dropdown-item" href="/">العودة للموقع</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form asp-controller="Account" asp-action="Logout" method="post">
+                                <button type="submit" class="dropdown-item text-danger">تسجيل الخروج</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <div class="admin-content">
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+    <!-- Arabic DataTable Init -->
+    <script src="~/js/datatable-ar.js"></script>
+
+    <!-- Site JS -->
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- Chart JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/charts.js"></script>
+
+    <!-- SignalR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        await RenderSectionAsync("Scripts", required: false);
+    }
+    
+    <script>
+        // Sidebar Toggle Logic
+        $(document).ready(function() {
+            $('#sidebarToggle, #sidebarClose').on('click', function() {
+                $('#adminSidebar').toggleClass('active');
+            });
+
+            // Close sidebar when clicking outside on mobile
+            $(document).on('click', function(e) {
+                if ($(window).width() < 992) {
+                    if (!$(e.target).closest('#adminSidebar, #sidebarToggle').length) {
+                        $('#adminSidebar').removeClass('active');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

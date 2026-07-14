@@ -1,0 +1,521 @@
+/* ========================================
+   CSS VARIABLES - Brand-Aligned Color Palette
+   ======================================== */
+:root {
+    /* Primary Brand Colors - Indigo & Violet Tech Palette (Inspired by Stripe) */
+    --primary-green: #6366f1;
+    --primary-green-dark: #4f46e5;
+    --primary-green-darker: #3730a3;
+    --primary-green-light: #818cf8;
+    --primary-green-lighter: #a5b4fc;
+    --primary-green-pale: #e0e7ff;
+
+    /* Accent Colors - Neon Sky Blue / Blue (Modified from yellow) */
+    --accent-yellow: #00d2ff;
+    --accent-yellow-dark: #00b4db;
+    --accent-yellow-darker: #0083b0;
+    --accent-gold: #00d2ff;
+    --accent-gold-light: #38bdf8;
+    --accent-gold-pale: #f0f9ff;
+
+    /* Status Colors */
+    --success-green: #10b981;
+    --success-green-dark: #059669;
+    --success-green-pale: #ecfdf5;
+
+    --warning-amber: #f59e0b;
+    --warning-amber-dark: #d97706;
+    --warning-amber-pale: #fffbeb;
+
+    --danger-red: #ef4444;
+    --danger-red-dark: #dc2626;
+    --danger-red-pale: #fef2f2;
+
+    --info-teal: #06b6d4;
+    --info-teal-dark: #0891b2;
+    --info-teal-pale: #ecfeff;
+
+    /* Neutral Colors */
+    --bg-light: #f8fafc;
+    --bg-white: #ffffff;
+    --bg-gray: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --border-light: #e2e8f0;
+    --border-medium: #cbd5e1;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-lg: 0 10px 25px -3px rgba(99, 102, 241, 0.05), 0 4px 12px -2px rgba(0, 0, 0, 0.025);
+    --shadow-hover: 0 20px 35px -5px rgba(99, 102, 241, 0.1), 0 10px 20px -5px rgba(0, 0, 0, 0.04);
+
+    /* Transitions */
+    --transition-fast: 0.15s ease-in-out;
+    --transition-normal: 0.25s ease-in-out;
+}
+
+/* ========================================
+   BASE STYLES
+   ======================================== */
+html {
+    font-size: 14px;
+    font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    position: relative;
+    min-height: 100%;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+body {
+    background-attachment: fixed;
+    background-image: radial-gradient(circle at 5% 15%, rgba(99, 102, 241, 0.1) 0%, transparent 35%),
+                      radial-gradient(circle at 95% 85%, rgba(6, 182, 212, 0.1) 0%, transparent 35%),
+                      radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.05) 0%, transparent 45%),
+                      linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+    color: var(--text-primary);
+}
+
+/* ========================================
+   FOCUS STATES
+   ======================================== */
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem var(--primary-green);
+}
+
+/* ========================================
+   DASHBOARD CARD STYLES
+   ======================================== */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+    margin-bottom: 1.5rem;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+}
+
+.card-header.bg-info {
+    background: linear-gradient(135deg, var(--info-teal) 0%, var(--info-teal-dark) 100%) !important;
+}
+
+.card-header.bg-success {
+    background: linear-gradient(135deg, var(--success-green) 0%, var(--success-green-dark) 100%) !important;
+}
+
+.card-header.bg-warning {
+    background: linear-gradient(135deg, var(--warning-amber) 0%, var(--warning-amber-dark) 100%) !important;
+}
+
+.card-header.bg-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%) !important;
+}
+
+.card-header.bg-primary {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%) !important;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* ========================================
+   ENHANCED BADGES
+   ======================================== */
+.badge {
+    padding: 0.5em 0.85em;
+    font-weight: 600;
+    border-radius: 6px;
+    font-size: 0.85em;
+}
+
+.badge.bg-primary {
+    background-color: var(--primary-green) !important;
+}
+
+.badge.bg-success {
+    background-color: var(--success-green) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--warning-amber) !important;
+    color: var(--text-primary) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--danger-red) !important;
+}
+
+.badge.bg-info {
+    background-color: var(--info-teal) !important;
+}
+
+/* ========================================
+   ENHANCED BUTTONS
+   ======================================== */
+.btn {
+    border-radius: 8px;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    transition: all var(--transition-fast);
+    border: none;
+}
+
+.btn-primary {
+    background-color: var(--primary-green);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-green-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-success {
+    background-color: var(--success-green);
+}
+
+.btn-success:hover {
+    background-color: var(--success-green-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-danger {
+    background-color: var(--danger-red);
+}
+
+.btn-danger:hover {
+    background-color: var(--danger-red-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-warning {
+    background-color: var(--warning-amber);
+    color: var(--text-primary);
+}
+
+.btn-warning:hover {
+    background-color: var(--warning-amber-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-animate:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   LIST GROUP ENHANCEMENTS
+   ======================================== */
+.list-group-item {
+    border: 1px solid var(--border-light);
+    border-radius: 8px !important;
+    margin-bottom: 0.75rem;
+    transition: all var(--transition-fast);
+    background-color: var(--bg-white);
+}
+
+.list-group-item:hover {
+    box-shadow: var(--shadow-sm);
+    transform: translateX(-3px);
+    border-color: var(--primary-green);
+}
+
+.list-group-flush .list-group-item {
+    border-width: 0 0 1px;
+    border-radius: 0 !important;
+}
+
+/* ========================================
+   PROFILE SECTION
+   ======================================== */
+.img-thumbnail {
+    border: 3px solid var(--border-light);
+    padding: 0.25rem;
+    transition: all var(--transition-normal);
+}
+
+.img-thumbnail:hover {
+    border-color: var(--primary-green);
+    box-shadow: var(--shadow-md);
+}
+
+/* ========================================
+   TABLE ENHANCEMENTS
+   ======================================== */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table thead {
+    background-color: var(--bg-light);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 77, 0, 0.05);
+}
+
+/* DataTables Styles */
+table.dataTable td,
+table.dataTable th,
+table.dataTable td p {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    margin: 0;
+}
+
+.dataTables_wrapper {
+    direction: rtl;
+    text-align: right;
+}
+
+.dataTables_wrapper .dataTables_filter {
+    float: left;
+    text-align: left;
+    margin: 0 0 10px 0;
+}
+
+.dataTables_wrapper .dt-buttons {
+    float: right;
+    margin-bottom: 10px;
+}
+
+/* ========================================
+   LOADING SPINNER
+   ======================================== */
+.spinner-border {
+    color: var(--primary-green);
+}
+
+/* ========================================
+   ALERT ENHANCEMENTS
+   ======================================== */
+.alert {
+    border-radius: 8px;
+    border: none;
+    box-shadow: var(--shadow-sm);
+}
+
+.alert-success {
+    background-color: var(--success-green-pale);
+    color: var(--success-green-dark);
+}
+
+/* ========================================
+   MODAL ENHANCEMENTS
+   ======================================== */
+.modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    border: none;
+}
+
+.modal-footer {
+    border: none;
+    padding: 1rem 1.5rem;
+}
+
+/* ========================================
+   FORM ENHANCEMENTS
+   ======================================== */
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+    padding: 0.625rem 0.875rem;
+    transition: all var(--transition-fast);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 0.2rem rgba(0, 77, 0, 0.15);
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+/* ========================================
+   SCROLL TO TOP BUTTON
+   ======================================== */
+#scrollTopBtn {
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 999;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    background-color: var(--accent-yellow);
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: 15px;
+    border-radius: 50%;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+}
+
+#scrollTopBtn:hover {
+    background-color: var(--accent-yellow-dark);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+.fade-in-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.4s ease-out;
+}
+
+/* ========================================
+   DASHBOARD SPECIFIC STYLES
+   ======================================== */
+.dashboard-stat-card {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+}
+
+.dashboard-stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.dashboard-stat-card h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-stat-card p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+/* Earnings Display */
+.earnings-card {
+    background: linear-gradient(135deg, var(--success-green) 0%, var(--success-green-dark) 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+}
+
+.earnings-card h4 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-secondary);
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+/* ========================================
+   RESPONSIVE ADJUSTMENTS
+   ======================================== */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .dashboard-stat-card h3 {
+        font-size: 1.5rem;
+    }
+}
+
+/* ========================================
+   GLOBAL RATING STARS STYLE
+   ======================================== */
+.fa-star, .fa-star-half-alt, .fa-star-half {
+    color: #ffb300 !important;
+}

@@ -1,0 +1,59 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Sany3y.Infrastructure.DTOs
+{
+    public class UserDTO
+    {
+        [Required]
+        [Display(Name = "First Name")]
+        public string FirstName { get; set; }
+
+        [Required]
+        [Display(Name = "Last Name")]
+        public string LastName { get; set; }
+
+        [Required]
+        [Display(Name = "User Name")]
+        public string UserName { get; set; }
+
+        [Required]
+        [Display(Name = "Birth Date")]
+        [DataType(DataType.DateTime)]
+        public DateTime BirthDate { get; set; }
+
+        [Required]
+        public string Email { get; set; }
+
+        [Required]
+        [Display(Name = "Phone Number")]
+        public string PhoneNumber { get; set; }
+
+        [Required]
+        public string Governorate { get; set; }
+
+        [Required]
+        public string City { get; set; }
+
+        [Required]
+        public string Street { get; set; }
+
+        public string? ProfilePicture { get; set; }
+
+        public string? Bio { get; set; }
+        
+        public int? CategoryId { get; set; }
+
+        public int? ExperienceYears { get; set; }
+
+        public decimal? Price { get; set; }
+
+        public bool? IsShop { get; set; }
+
+        public string? ShopName { get; set; }
+    }
+}
