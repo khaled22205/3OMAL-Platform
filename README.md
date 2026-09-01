@@ -238,7 +238,8 @@ python app.py
 
 ### Project Documents
 - 🗺️ [Physical ERD Diagram](./docs/ERDs/ERD.png)
-- 📄 [Full Documentation](./docs/Sany3y.pdf)
+- 📄 [Comprehensive Arabic Documentation - التوثيق البرمجي الشامل](./docs/PROJECT_DOCUMENTATION_AR.md)
+- 📄 [Full PDF Documentation](./docs/3OMMAL.pdf)
 
 ### API Documentation
 - Access Swagger UI at `https://localhost:7178/swagger` when running the API
